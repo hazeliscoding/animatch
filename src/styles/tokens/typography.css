@@ -1,0 +1,8 @@
+:root{
+--font-sans:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic Medium","Yu Gothic",Meiryo,sans-serif;
+--font-mono:"SF Mono",Menlo,Consolas,monospace;
+--text-xs:12px;--text-sm:13px;--text-md:14px;--text-base:16px;--text-lg:18px;--text-xl:20px;--text-2xl:24px;--text-3xl:28px;
+--leading-tight:1.35;--leading-normal:1.6;--leading-loose:1.8;
+--weight-normal:400;--weight-medium:500;--weight-bold:700;
+--tracking-heading:.01em;
+}

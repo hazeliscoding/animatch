@@ -1,0 +1,48 @@
+<div class="page hk-stack">
+  <hk-breadcrumbs [items]="crumbs" />
+
+  <div class="title-row">
+    <h1 class="title">Saturday watch club <span class="subtitle">4 members</span></h1>
+    <div class="title-action"><hk-button variant="secondary" size="sm">+ Add member</hk-button></div>
+  </div>
+
+  <hk-module title="Member stats">
+    <hk-comparison-table
+      [products]="groupUsers"
+      [attributes]="groupAttrs"
+      [highlight]="groupHighlight"
+    />
+  </hk-module>
+
+  <div class="grid">
+    <hk-module title="Pairwise taste match" [pad]="true">
+      <div class="matrix">
+        <div></div>
+        @for (u of groupUsers; track u) {
+          <div class="m-head">{{ u }}</div>
+        }
+        @for (c of matrixCells; track $index) {
+          <div class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</div>
+        }
+      </div>
+      <div class="matrix-note">
+        Match score combines score correlation and genre overlap on completed lists. 70+ = strong match.
+      </div>
+    </hk-module>
+
+    <hk-module title="Backlog shared by the group" action="All 12">
+      <div class="backlog-list">
+        @for (g of groupBacklog; track g.title) {
+          <div class="row">
+            <span class="chip" [class]="'chip-' + g.chipKind">{{ g.chip }}</span>
+            <div class="main">
+              <a href="#" (click)="$event.preventDefault()" class="row-title">{{ g.title }}</a>
+              <div class="meta">{{ g.meta }}</div>
+            </div>
+            <div class="who">{{ g.who }}</div>
+          </div>
+        }
+      </div>
+    </hk-module>
+  </div>
+</div>

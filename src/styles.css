@@ -1,0 +1,17 @@
+/* Hikari Design System — global entry */
+@import "./styles/tokens/colors.css";
+@import "./styles/tokens/typography.css";
+@import "./styles/tokens/spacing.css";
+@import "./styles/tokens/borders.css";
+@import "./styles/tokens/elevation.css";
+@import "./styles/tokens/density.css";
+@import "./styles/tokens/base.css";
+@import "./styles/tokens/utilities.css";
+
+/* App-level responsive helpers (breakpoint per Hikari portal grid) */
+@media (max-width: 719px) {
+  .desktop-only { display: none !important; }
+}
+@media (min-width: 720px) {
+  .mobile-only { display: none !important; }
+}

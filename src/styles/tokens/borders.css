@@ -1,0 +1,5 @@
+:root{
+--radius-0:0;--radius-2:2px;--radius-4:4px;--radius-6:6px;--radius-8:8px;
+--radius-control:4px;--radius-module:6px;--radius-badge:2px;
+--border-thin:1px solid var(--color-border);--border-subtle:1px solid var(--color-border-subtle);--border-strong:1px solid var(--color-border-strong);
+}

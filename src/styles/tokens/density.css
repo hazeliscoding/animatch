@@ -1,0 +1,15 @@
+:root,[data-density="standard"]{
+--control-height:34px;--control-height-sm:28px;--control-height-lg:42px;
+--control-px:12px;--row-py:8px;--row-px:12px;--list-gap:6px;--module-pad:12px;--table-py:8px;--table-px:12px;--nav-py:8px;--stack-gap:12px;
+--control-font:var(--text-md);
+}
+[data-density="compact"]{
+--control-height:28px;--control-height-sm:24px;--control-height-lg:36px;
+--control-px:8px;--row-py:5px;--row-px:8px;--list-gap:4px;--module-pad:8px;--table-py:5px;--table-px:8px;--nav-py:5px;--stack-gap:8px;
+--control-font:var(--text-sm);
+}
+[data-density="comfortable"]{
+--control-height:44px;--control-height-sm:36px;--control-height-lg:50px;
+--control-px:16px;--row-py:12px;--row-px:16px;--list-gap:8px;--module-pad:16px;--table-py:12px;--table-px:16px;--nav-py:12px;--stack-gap:16px;
+--control-font:var(--text-base);
+}

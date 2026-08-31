@@ -1,0 +1,77 @@
+<div class="page hk-stack">
+  <hk-breadcrumbs [items]="crumbs" />
+  <h1 class="title">
+    Shared backlog <span class="subtitle">{{ userA.name }} × {{ userB.name }}</span>
+  </h1>
+  <hk-tabs [items]="tabs" [active]="activeTab()" (change)="activeTab.set($event)" />
+
+  <div class="layout">
+    <div class="list-panel">
+      <div class="list-head">
+        <span class="count"><strong>34 titles</strong> in both plan-to-watch lists</span>
+        <span class="sort-label">Sort:</span>
+        @for (s of sorts; track s) {
+          <a
+            href="#"
+            class="sort-link"
+            [class.active]="sort() === s"
+            (click)="$event.preventDefault(); sort.set(s)"
+          >{{ s }}</a>
+        }
+      </div>
+
+      @if (activeTab() === 'Both plan to watch') {
+        @for (k of backlog; track k.title) {
+          <div class="item">
+            <div class="poster">IMG</div>
+            <div class="main">
+              <div class="title-row">
+                <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
+                <span class="chip" [class]="'chip-' + k.chipKind">{{ k.chip }}</span>
+              </div>
+              <div class="meta">{{ k.meta }}</div>
+              <div class="note">{{ k.note }}</div>
+            </div>
+            <div class="predicted">
+              <div class="predicted-label">Predicted mutual</div>
+              <div class="predicted-score">★ {{ k.score }}</div>
+            </div>
+            <hk-button variant="ghost" size="sm">Queue →</hk-button>
+          </div>
+        }
+        <div class="show-all"><a href="#" (click)="$event.preventDefault()">Show all 34 →</a></div>
+      } @else {
+        <div class="placeholder">Connect AniList to populate “{{ activeTab() }}”.</div>
+      }
+    </div>
+
+    <div class="rail hk-stack">
+      <hk-module title="Watch-together picks" accent="tint" [pad]="true">
+        <div class="picks">
+          @for (p of picks; track p.rank) {
+            <div class="pick">
+              <span class="medal" [class]="'medal-' + p.medal">{{ p.rank }}</span>
+              <div class="pick-main">
+                <a href="#" (click)="$event.preventDefault()" class="pick-title">{{ p.title }}</a>
+                <div class="pick-reason">{{ p.reason }}</div>
+              </div>
+            </div>
+          }
+        </div>
+      </hk-module>
+
+      <hk-module title="Backlog overlap" [pad]="true">
+        <div class="overlap">
+          <div class="o-row"><span>{{ userA.name }} plan to watch</span><strong>96</strong></div>
+          <div class="o-row"><span>{{ userB.name }} plan to watch</span><strong>143</strong></div>
+          <div class="o-row total"><span>In both backlogs</span><strong class="both">34 (24%)</strong></div>
+          <div class="o-bar">
+            <div class="seg-both"></div>
+            <div class="seg-one"></div>
+          </div>
+          <div class="o-note">Overlap counts titles present in both users' planning lists.</div>
+        </div>
+      </hk-module>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div class="shell">
+  <!-- Desktop chrome -->
+  <div class="desktop-only">
+    <hk-utility-bar [left]="utilLeft" [right]="utilRight" />
+    <hk-global-header brand="AniMatch" tagline="for AniList">
+      <hk-search-input placeholder="Search a user or anime title" />
+    </hk-global-header>
+    <hk-global-nav [items]="navItems" [active]="activeNav()" />
+  </div>
+
+  <!-- Mobile chrome -->
+  <div class="mobile-header mobile-only">
+    <span class="m-brand">AniMatch</span>
+    <span class="m-tagline">for AniList</span>
+    <a href="#" class="m-signin" (click)="$event.preventDefault()">Sign in</a>
+  </div>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <nav class="mobile-nav mobile-only" aria-label="Primary">
+    @for (m of mobileNav; track m.label) {
+      @if (m.path) {
+        <a [routerLink]="m.path" routerLinkActive="active" class="m-item">
+          <span class="glyph">{{ m.glyph }}</span>{{ m.label }}
+        </a>
+      } @else {
+        <a href="#" class="m-item" (click)="$event.preventDefault()">
+          <span class="glyph">{{ m.glyph }}</span>{{ m.label }}
+        </a>
+      }
+    }
+  </nav>
+</div>

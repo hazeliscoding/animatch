@@ -1,0 +1,16 @@
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans);font-size:var(--text-base);line-height:var(--leading-normal);color:var(--color-text);background:var(--color-background);-webkit-font-smoothing:antialiased;overflow-wrap:anywhere;line-break:strict}
+h1,h2,h3,h4,h5,h6{margin:0;font-weight:var(--weight-bold);line-height:var(--leading-tight);letter-spacing:var(--tracking-heading);font-feature-settings:"palt"}
+p{margin:0}
+a{color:var(--color-link);text-decoration:none}
+a:hover{color:var(--color-link-hover);text-decoration:underline}
+a:visited{color:var(--color-link-visited)}
+a.hk-link-plain,a.hk-link-plain:visited{color:var(--color-link)}
+a.hk-link-quiet,a.hk-link-quiet:visited{color:var(--color-text)}
+a.hk-link-quiet:hover{color:var(--color-link-hover)}
+:focus-visible{outline:2px solid var(--color-focus);outline-offset:1px}
+button,input,select,textarea{font-family:inherit;font-size:inherit}
+table{border-collapse:collapse}
+img{max-width:100%;display:block}
+::selection{background:var(--color-selection)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}

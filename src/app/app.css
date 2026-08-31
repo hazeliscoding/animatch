@@ -20,7 +20,8 @@
   border-top: var(--border-thin);
   display: flex;
 }
-.m-item {
+.m-item,
+.m-item:visited {
   flex: 1;
   min-height: 48px;
   display: flex;
@@ -34,5 +35,6 @@
   font-weight: 400;
 }
 .m-item:hover { text-decoration: none; }
-.m-item.active { color: var(--blue-700); font-weight: 700; }
+.m-item.active,
+.m-item.active:visited { color: var(--blue-700); font-weight: 700; }
 .glyph { font-size: 15px; }

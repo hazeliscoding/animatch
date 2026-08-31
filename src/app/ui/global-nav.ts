@@ -16,13 +16,13 @@ export interface NavItem {
           <li>
             @if (item.path) {
               <a
-                class="item hk-link-plain"
+                class="item"
                 [routerLink]="item.path"
                 [class.active]="item.label === active()"
                 [attr.aria-current]="item.label === active() ? 'page' : null"
               >{{ item.label }}</a>
             } @else {
-              <a class="item hk-link-plain" href="#" (click)="$event.preventDefault()">{{ item.label }}</a>
+              <a class="item" href="#" (click)="$event.preventDefault()">{{ item.label }}</a>
             }
           </li>
         }
@@ -39,7 +39,10 @@ export interface NavItem {
       list-style: none;
       overflow-x: auto;
     }
-    .item {
+    /* States spelled out per-selector: the global a:visited / a.hk-link-plain
+       rules must never win here, or inactive items render blue-on-blue. */
+    a.item,
+    a.item:visited {
       display: block;
       padding: var(--nav-py) 14px;
       color: #fff;
@@ -48,8 +51,13 @@ export interface NavItem {
       text-decoration: none;
       white-space: nowrap;
     }
-    .item:hover { background: var(--color-primary-hover); color: #fff; text-decoration: none; }
-    .item.active { background: var(--color-primary-active); font-weight: 700; }
+    a.item:hover { background: var(--color-primary-hover); color: #fff; text-decoration: none; }
+    a.item.active,
+    a.item.active:visited {
+      background: var(--color-primary-active);
+      font-weight: 700;
+      color: #fff;
+    }
   `,
 })
 export class HkGlobalNav {

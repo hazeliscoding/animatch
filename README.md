@@ -30,4 +30,5 @@ npm install
 npm start        # dev server on http://localhost:4200
 npm run build    # production build to dist/
 npm test         # unit tests (vitest)
+npm run e2e      # end-to-end tests (playwright, starts its own dev server)
 ```

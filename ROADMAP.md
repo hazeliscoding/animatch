@@ -23,5 +23,5 @@
 ## Phase 4 — Polish & delivery
 - [ ] Mobile layouts for Shared backlog and Groups
 - [ ] Density switcher (compact / standard / comfortable — tokens already support it)
-- [ ] E2E smoke tests (Playwright)
+- [x] E2E smoke tests (Playwright)
 - [ ] CI (build + test) and deploy (static hosting)

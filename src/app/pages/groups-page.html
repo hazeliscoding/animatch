@@ -2,26 +2,55 @@
   <hk-breadcrumbs [items]="crumbs" />
 
   <div class="title-row">
-    <h1 class="title">Saturday watch club <span class="subtitle">4 members</span></h1>
-    <div class="title-action"><hk-button variant="secondary" size="sm">+ Add member</hk-button></div>
+    <h1 class="title">{{ groupName() }} <span class="subtitle">{{ memberCount() }} members</span></h1>
+  </div>
+
+  <div class="picker">
+    <div class="picker-row">
+      <span class="picker-label">Group members</span>
+      @for (m of members(); track m) {
+        <span class="member-chip">
+          {{ m }}
+          <button type="button" class="chip-x" [attr.aria-label]="'Remove ' + m" (click)="removeMember(m)">×</button>
+        </span>
+      }
+      @if (canAdd()) {
+        <input
+          class="picker-input"
+          [(ngModel)]="newMember"
+          placeholder="AniList username"
+          [disabled]="loading()"
+          (keyup.enter)="addMember()"
+        />
+        <hk-button variant="secondary" size="sm" [disabled]="loading()" (click)="addMember()">+ Add member</hk-button>
+      }
+      @if (loading()) {
+        <span class="picker-note">Loading lists…</span>
+      }
+    </div>
+    @if (error(); as err) {
+      <div class="picker-error">{{ err }}</div>
+    } @else if (!live()) {
+      <div class="picker-note">Showing demo data — add 2–5 AniList usernames to build a real group.</div>
+    }
   </div>
 
   <hk-module title="Member stats">
     <hk-comparison-table
-      [products]="groupUsers"
-      [attributes]="groupAttrs"
-      [highlight]="groupHighlight"
+      [products]="display().users"
+      [attributes]="display().attrs"
+      [highlight]="display().highlight"
     />
   </hk-module>
 
   <div class="grid">
     <hk-module title="Pairwise taste match" [pad]="true">
-      <div class="matrix">
+      <div class="matrix" [style.grid-template-columns]="'110px repeat(' + display().users.length + ', 1fr)'">
         <div></div>
-        @for (u of groupUsers; track u) {
+        @for (u of display().users; track u) {
           <div class="m-head">{{ u }}</div>
         }
-        @for (c of matrixCells; track $index) {
+        @for (c of display().matrixCells; track $index) {
           <div class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</div>
         }
       </div>
@@ -30,9 +59,9 @@
       </div>
     </hk-module>
 
-    <hk-module title="Backlog shared by the group" action="All 12">
+    <hk-module title="Backlog shared by the group" [action]="'All ' + display().backlogTotal">
       <div class="backlog-list">
-        @for (g of groupBacklog; track g.title) {
+        @for (g of display().backlog; track g.title) {
           <div class="row">
             <span class="chip" [class]="'chip-' + g.chipKind">{{ g.chip }}</span>
             <div class="main">
@@ -41,6 +70,8 @@
             </div>
             <div class="who">{{ g.who }}</div>
           </div>
+        } @empty {
+          <div class="placeholder">No titles planned by two or more members yet.</div>
         }
       </div>
     </hk-module>

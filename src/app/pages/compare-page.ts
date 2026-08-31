@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AnilistService } from '../api/anilist.service';
+import { PairStore } from '../api/pair-store';
 import { DEMO_COMPARISON } from '../data/demo-comparison';
 import { ComparisonView, buildComparison } from '../logic/comparison-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
@@ -16,7 +16,7 @@ import { HkModule } from '../ui/module';
   styleUrl: './compare-page.css',
 })
 export class ComparePage {
-  private readonly anilist = inject(AnilistService);
+  private readonly pairStore = inject(PairStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -68,10 +68,7 @@ export class ComparePage {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const [listA, listB] = await Promise.all([
-        this.anilist.getCompletedList(a),
-        this.anilist.getCompletedList(b),
-      ]);
+      const [listA, listB] = await this.pairStore.load(a, b);
       this.view.set(buildComparison(listA, listB));
       this.live.set(true);
       this.editing.set(false);

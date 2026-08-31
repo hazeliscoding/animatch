@@ -18,6 +18,7 @@ export interface NavItem {
               <a
                 class="item"
                 [routerLink]="item.path"
+                queryParamsHandling="preserve"
                 [class.active]="item.label === active()"
                 [attr.aria-current]="item.label === active() ? 'page' : null"
               >{{ item.label }}</a>

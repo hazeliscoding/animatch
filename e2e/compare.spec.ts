@@ -1,57 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-const gqlMedia = (id: number, title: string, genres: string[], studio: string) => ({
-  id,
-  title: { userPreferred: title },
-  format: 'TV',
-  seasonYear: 2020,
-  episodes: 12,
-  genres,
-  coverImage: { medium: null },
-  studios: { nodes: [{ name: studio }] },
-});
-
-const M1 = gqlMedia(1, 'Anime One', ['Action'], 'MAPPA');
-const M2 = gqlMedia(2, 'Anime Two', ['Drama'], 'MAPPA');
-const M3 = gqlMedia(3, 'Anime Three', ['Action'], 'Bones');
-const M4 = gqlMedia(4, 'Anime Four', ['Romance'], 'Bones');
-
-const FIXTURES: Record<string, unknown> = {
-  alice: {
-    data: {
-      MediaListCollection: {
-        user: { id: 1, name: 'alice', avatar: { medium: null } },
-        lists: [
-          {
-            isCustomList: false,
-            entries: [
-              { score: 9, media: M1 },
-              { score: 4, media: M2 },
-              { score: 8, media: M3 },
-            ],
-          },
-        ],
-      },
-    },
-  },
-  bob: {
-    data: {
-      MediaListCollection: {
-        user: { id: 2, name: 'bob', avatar: { medium: null } },
-        lists: [
-          {
-            isCustomList: false,
-            entries: [
-              { score: 8.5, media: M1 },
-              { score: 9, media: M2 },
-              { score: 7, media: M4 },
-            ],
-          },
-        ],
-      },
-    },
-  },
-};
+import { FIXTURES } from './fixtures';
 
 test('demo comparison renders until real users are compared', async ({ page }) => {
   await page.goto('/compare');

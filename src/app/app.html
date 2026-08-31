@@ -22,7 +22,7 @@
   <nav class="mobile-nav mobile-only" aria-label="Primary">
     @for (m of mobileNav; track m.label) {
       @if (m.path) {
-        <a [routerLink]="m.path" routerLinkActive="active" class="m-item">
+        <a [routerLink]="m.path" queryParamsHandling="preserve" routerLinkActive="active" class="m-item">
           <span class="glyph">{{ m.glyph }}</span>{{ m.label }}
         </a>
       } @else {

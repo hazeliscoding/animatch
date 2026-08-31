@@ -115,12 +115,13 @@ export function histogram(entries: AnimeEntry[]): HistBin[] {
 const fmt1 = (v: number) => (Math.round(v * 10) / 10).toFixed(1);
 
 function summarize(list: AnilistUserList): UserSummary & { avatar: string | null } {
-  const scored = list.entries.filter((e) => e.score != null);
+  const completed = completedOf(list);
+  const scored = completed.filter((e) => e.score != null);
   const mean = scored.length ? scored.reduce((s, e) => s + (e.score ?? 0), 0) / scored.length : 0;
   return {
     name: list.name,
     initial: list.name.charAt(0).toUpperCase(),
-    completed: list.entries.length,
+    completed: completed.length,
     mean: Number(fmt1(mean)),
     avatar: list.avatar,
   };
@@ -132,26 +133,61 @@ function metaOf(e: AnimeEntry): string {
   return parts.join(' · ');
 }
 
-export function buildComparison(a: AnilistUserList, b: AnilistUserList): ComparisonView {
-  const bById = new Map(b.entries.map((e) => [e.mediaId, e]));
-  const shared = a.entries
-    .filter((e) => bById.has(e.mediaId))
-    .map((e) => ({ a: e, b: bById.get(e.mediaId)! }));
-  const sharedScored = shared.filter((p) => p.a.score != null && p.b.score != null);
+export const completedOf = (list: AnilistUserList): AnimeEntry[] =>
+  list.entries.filter((e) => e.status === 'COMPLETED');
 
+export interface PairScore {
+  r: number;
+  genrePct: number;
+  completedPct: number;
+  studioPct: number;
+  sharedCount: number;
+  sharedScoredCount: number;
+  unionCount: number;
+  score: number;
+}
+
+/** 0–100 taste match over two COMPLETED entry sets (45/30/15/10 weights). */
+export function pairCompatScore(aEntries: AnimeEntry[], bEntries: AnimeEntry[]): PairScore {
+  const bById = new Map(bEntries.map((e) => [e.mediaId, e]));
+  const shared = aEntries.filter((e) => bById.has(e.mediaId)).map((e) => ({ a: e, b: bById.get(e.mediaId)! }));
+  const sharedScored = shared.filter((p) => p.a.score != null && p.b.score != null);
   const r = pearson(
     sharedScored.map((p) => p.a.score!),
     sharedScored.map((p) => p.b.score!),
   );
-  const genrePct = genreOverlap(a.entries, b.entries);
-  const unionCount = a.entries.length + b.entries.length - shared.length;
+  const genrePct = genreOverlap(aEntries, bEntries);
+  const unionCount = aEntries.length + bEntries.length - shared.length;
   const completedPct = unionCount === 0 ? 0 : Math.round((shared.length / unionCount) * 100);
-  const studioPct = studioAffinity(a.entries, b.entries);
-
-  const compatScore = Math.max(
+  const studioPct = studioAffinity(aEntries, bEntries);
+  const score = Math.max(
     0,
     Math.min(100, Math.round(0.45 * Math.max(r, 0) * 100 + 0.3 * genrePct + 0.15 * completedPct + 0.1 * studioPct)),
   );
+  return {
+    r,
+    genrePct,
+    completedPct,
+    studioPct,
+    sharedCount: shared.length,
+    sharedScoredCount: sharedScored.length,
+    unionCount,
+    score,
+  };
+}
+
+export function buildComparison(a: AnilistUserList, b: AnilistUserList): ComparisonView {
+  const aEntries = completedOf(a);
+  const bEntries = completedOf(b);
+  const bById = new Map(bEntries.map((e) => [e.mediaId, e]));
+  const shared = aEntries
+    .filter((e) => bById.has(e.mediaId))
+    .map((e) => ({ a: e, b: bById.get(e.mediaId)! }));
+  const sharedScored = shared.filter((p) => p.a.score != null && p.b.score != null);
+
+  const pair = pairCompatScore(aEntries, bEntries);
+  const { r, genrePct, completedPct, studioPct, unionCount } = pair;
+  const compatScore = pair.score;
 
   const breakdown: BreakdownItem[] = [
     {
@@ -207,8 +243,8 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     const total = Math.max(1, entries.length);
     return { counts, total };
   };
-  const ga = genrePcts(a.entries);
-  const gb = genrePcts(b.entries);
+  const ga = genrePcts(aEntries);
+  const gb = genrePcts(bEntries);
   const allGenres = new Set([...ga.counts.keys(), ...gb.counts.keys()]);
   const genres: GenreRow[] = [...allGenres]
     .map((name) => {
@@ -229,8 +265,8 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     sharedFooter,
     sharedTotal: sharedScored.length,
     disagreementTotal: sharedScored.filter((p) => Math.abs(p.a.score! - p.b.score!) >= 2).length,
-    histA: histogram(a.entries),
-    histB: histogram(b.entries),
+    histA: histogram(aEntries),
+    histB: histogram(bEntries),
     genres,
   };
 }

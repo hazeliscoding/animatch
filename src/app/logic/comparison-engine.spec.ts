@@ -9,13 +9,17 @@ import {
 
 const entry = (over: Partial<AnimeEntry> & { mediaId: number }): AnimeEntry => ({
   title: `Anime ${over.mediaId}`,
+  status: 'COMPLETED',
   score: null,
+  progress: 0,
   genres: [],
   studios: [],
   format: 'TV',
   year: 2020,
   cover: null,
   episodes: 12,
+  averageScore: null,
+  popularity: 0,
   ...over,
 });
 

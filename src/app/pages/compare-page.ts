@@ -1,44 +1,89 @@
-import { Component } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AnilistService } from '../api/anilist.service';
+import { DEMO_COMPARISON } from '../data/demo-comparison';
+import { ComparisonView, buildComparison } from '../logic/comparison-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
-import { HkDataTable } from '../ui/data-table';
+import { HkDataTable, TableColumn } from '../ui/data-table';
 import { HkModule } from '../ui/module';
-import {
-  BREAKDOWN,
-  COMPAT_SCORE,
-  DISAGREEMENTS,
-  GENRES,
-  HIST_A,
-  HIST_B,
-  SHARED_COLS,
-  SHARED_FOOTER,
-  SHARED_ROWS,
-  USER_A,
-  USER_B,
-} from '../data/animatch-data';
 
 @Component({
   selector: 'app-compare-page',
-  imports: [HkBreadcrumbs, HkButton, HkDataTable, HkModule],
+  imports: [FormsModule, HkBreadcrumbs, HkButton, HkDataTable, HkModule],
   templateUrl: './compare-page.html',
   styleUrl: './compare-page.css',
 })
 export class ComparePage {
-  readonly userA = USER_A;
-  readonly userB = USER_B;
-  readonly compatScore = COMPAT_SCORE;
-  readonly breakdown = BREAKDOWN;
-  readonly disagreements = DISAGREEMENTS;
-  readonly disagreementsMobile = DISAGREEMENTS.slice(0, 3);
-  readonly sharedCols = SHARED_COLS;
-  readonly sharedRows = SHARED_ROWS;
-  readonly sharedFooter = SHARED_FOOTER;
-  readonly histA = HIST_A;
-  readonly histB = HIST_B;
-  readonly genres = GENRES;
-  readonly crumbs = [
+  private readonly anilist = inject(AnilistService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+
+  readonly view = signal<ComparisonView>(DEMO_COMPARISON);
+  readonly live = signal(false);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly editing = signal(false);
+
+  nameA = '';
+  nameB = '';
+
+  readonly sharedCols = computed<TableColumn[]>(() => [
+    { key: 'title', label: 'Title' },
+    { key: 'a', label: this.view().userA.name, align: 'right', sortable: true },
+    { key: 'b', label: this.view().userB.name, align: 'right', sortable: true },
+    { key: 'd', label: 'Δ', align: 'right', sortable: true },
+  ]);
+
+  readonly crumbs = computed(() => [
     { label: 'Home', path: '/compare' },
     { label: 'Compare', path: '/compare' },
-    { label: 'yuki_47 × renko_lists' },
-  ];
+    { label: `${this.view().userA.name} × ${this.view().userB.name}` },
+  ]);
+
+  constructor() {
+    const qp = this.route.snapshot.queryParamMap;
+    const a = qp.get('a');
+    const b = qp.get('b');
+    if (a && b) {
+      this.nameA = a;
+      this.nameB = b;
+      void this.compare();
+    }
+  }
+
+  showPicker() {
+    return this.editing() || !this.live();
+  }
+
+  async compare() {
+    if (this.loading()) return;
+    const a = this.nameA.trim();
+    const b = this.nameB.trim();
+    if (!a || !b) {
+      this.error.set('Enter two AniList usernames.');
+      return;
+    }
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const [listA, listB] = await Promise.all([
+        this.anilist.getCompletedList(a),
+        this.anilist.getCompletedList(b),
+      ]);
+      this.view.set(buildComparison(listA, listB));
+      this.live.set(true);
+      this.editing.set(false);
+      void this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { a: listA.name, b: listB.name },
+        queryParamsHandling: 'merge',
+      });
+    } catch (e) {
+      this.error.set(e instanceof Error ? e.message : 'Comparison failed.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 }

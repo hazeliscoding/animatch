@@ -1,10 +1,11 @@
 # Roadmap
 
 ## Phase 1 — Real data
-- [ ] AniList GraphQL client (public API, no auth needed for public lists)
-- [ ] Replace `animatch-data.ts` mock constants with a data service (user lists, scores, genres)
-- [ ] Compute compatibility for real user pairs: Pearson correlation, genre overlap, completed overlap, studio affinity
-- [ ] Real cover art in disagreement/backlog lists (replace `IMG` placeholders)
+- [x] AniList GraphQL client (public API, no auth needed for public lists)
+- [x] Compute compatibility for real user pairs: Pearson correlation, genre overlap, completed overlap, studio affinity
+- [x] Compare page on real users (`/compare?a=<user>&b=<user>`), with the mockup data kept as demo state
+- [x] Real cover art + avatars on the compare page (replace `IMG` placeholders)
+- [ ] Real data for the Shared backlog and Groups pages (PLANNING lists, predicted mutual scores)
 - [ ] User search wired to the header search input
 
 ## Phase 2 — Accounts

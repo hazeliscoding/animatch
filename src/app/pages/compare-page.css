@@ -4,6 +4,39 @@
   padding: 12px 16px 24px;
 }
 
+/* ---- user picker ---- */
+.picker {
+  background: var(--color-surface);
+  border: var(--border-thin);
+  border-radius: var(--radius-module);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.picker-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.picker-label { font-size: 13px; font-weight: 700; color: var(--color-text); }
+.picker-input {
+  height: var(--control-height-sm);
+  padding: 0 10px;
+  font-size: var(--text-sm);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  min-width: 0;
+  width: 180px;
+}
+.picker-input:focus { border-color: var(--color-primary); outline: none; }
+.picker-error {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red-700);
+  background: var(--red-50);
+  border-radius: var(--radius-2);
+  padding: 4px 8px;
+}
+.picker-note { font-size: 12px; color: var(--color-text-muted); }
+
 /* ---- duo panel (desktop) ---- */
 .duo-panel {
   background: var(--color-surface);
@@ -28,6 +61,8 @@
 .avatar.sm { width: 36px; height: 36px; font-size: 14px; }
 .avatar.a { background: var(--blue-100); color: var(--blue-700); }
 .avatar.b { background: var(--orange-50); color: var(--orange-700); }
+.avatar { overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 .user-name { font-size: 16px; font-weight: 700; color: var(--color-text); }
 .user-meta { font-size: 12px; color: var(--color-text-muted); }
 .vs { font-size: 13px; color: var(--color-text-muted); font-weight: 700; }
@@ -112,6 +147,8 @@
   font-size: 10px;
   color: var(--color-text-muted);
 }
+.poster { overflow: hidden; }
+.poster img { width: 100%; height: 100%; object-fit: cover; }
 .dis-main { min-width: 0; flex: 1; }
 .dis-title { font-size: 14px; font-weight: 700; text-decoration: none; }
 .dis-title.sm { font-size: 13px; }

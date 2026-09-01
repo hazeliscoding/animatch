@@ -30,6 +30,18 @@
       } @else if (!live()) {
         <div class="picker-note">Showing demo data until you compare two real users.</div>
       }
+      @if (!live() && history.comparisons().length) {
+        <div class="picker-recent">
+          <span class="recent-label">Recent:</span>
+          @for (c of history.comparisons().slice(0, 4); track c.a + c.b) {
+            <button
+              type="button"
+              class="recent-chip"
+              (click)="nameA = c.a; nameB = c.b; compare()"
+            >{{ c.a }} × {{ c.b }}</button>
+          }
+        </div>
+      }
     </div>
   }
 

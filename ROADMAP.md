@@ -9,9 +9,9 @@
 - [x] User search wired to the header search input
 
 ## Phase 2 — Accounts
-- [ ] "Connect AniList" OAuth flow
-- [ ] My profile page
-- [ ] Persist recent comparisons and groups (local first, backend later)
+- [x] "Connect AniList" OAuth flow (implicit grant; register a client and paste the ID on the profile page)
+- [x] My profile page (own stats when connected, any public profile via `?u=`)
+- [x] Persist recent comparisons and groups (localStorage — backend sync later)
 
 ## Phase 3 — Depth
 - [ ] Recommendations page (predicted mutual scores across the full catalog)
@@ -24,4 +24,5 @@
 - [ ] Mobile layouts for Shared backlog and Groups
 - [ ] Density switcher (compact / standard / comfortable — tokens already support it)
 - [x] E2E smoke tests (Playwright)
-- [ ] CI (build + test) and deploy (static hosting)
+- [x] CI (GitHub Actions: build + unit + e2e)
+- [ ] Deploy to Vercel (`vercel.json` is ready — import the GitHub repo at vercel.com/new)

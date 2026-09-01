@@ -39,6 +39,12 @@ export interface AnilistUserHit {
   completed: number;
 }
 
+export interface AnilistViewer {
+  id: number;
+  name: string;
+  avatar: string | null;
+}
+
 const USER_LISTS_QUERY = `
 query ($name: String) {
   MediaListCollection(userName: $name, type: ANIME, forceSingleCompletedList: true) {
@@ -63,6 +69,15 @@ query ($name: String) {
         }
       }
     }
+  }
+}`;
+
+const VIEWER_QUERY = `
+query {
+  Viewer {
+    id
+    name
+    avatar { medium }
   }
 }`;
 
@@ -174,6 +189,22 @@ export class AnilistService {
       avatar: collection.user.avatar?.medium ?? null,
       entries: [...byMediaId.values()],
     };
+  }
+
+  /** Who does this OAuth token belong to? */
+  async getViewer(token: string): Promise<AnilistViewer> {
+    const res = await firstValueFrom(
+      this.http.post<{ data: { Viewer: { id: number; name: string; avatar: { medium: string | null } | null } | null } | null }>(
+        ANILIST_GRAPHQL,
+        { query: VIEWER_QUERY },
+        { headers: { Authorization: `Bearer ${token}` } },
+      ),
+    ).catch(() => {
+      throw new Error('AniList session is invalid or expired — connect again.');
+    });
+    const viewer = res.data?.Viewer;
+    if (!viewer) throw new Error('AniList session is invalid or expired — connect again.');
+    return { id: viewer.id, name: viewer.name, avatar: viewer.avatar?.medium ?? null };
   }
 
   /** Search AniList users by name prefix. */

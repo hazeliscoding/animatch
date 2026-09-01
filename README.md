@@ -12,6 +12,7 @@ Compare anime taste between [AniList](https://anilist.co) users. One place that 
 - 📚 **Shared backlog** — titles in both plan-to-watch lists, ranked by predicted mutual score, with watch-together picks.
 - 👥 **Groups** — member stats, a pairwise taste-match heat matrix, and the backlog shared by the whole group.
 - 📱 **Mobile layout** — compact summary view with bottom navigation under 720px.
+- 🪪 **Profiles & sign-in** — view any public profile's stats (score distribution, genre taste, top studios), or connect your own AniList account via OAuth. Recent comparisons and groups persist locally.
 
 | Shared backlog | Groups | Mobile |
 | --- | --- | --- |
@@ -32,3 +33,9 @@ npm run build    # production build to dist/
 npm test         # unit tests (vitest)
 npm run e2e      # end-to-end tests (playwright, starts its own dev server)
 ```
+
+## ☁️ Deploy
+
+Built for [Vercel](https://vercel.com) — import the repo at vercel.com/new and the included `vercel.json` handles the SPA rewrites and output directory. CI (build + unit + e2e) runs on every push via GitHub Actions.
+
+To enable "Connect AniList" on a deployment: register an API client at [anilist.co/settings/developer](https://anilist.co/settings/developer) with redirect URL `https://<your-domain>/auth/callback`, then paste the client ID into the one-time setup on the profile page (or set it as the default in `src/app/api/auth.service.ts`).

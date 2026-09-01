@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HistoryStore } from '../api/history-store';
 import { PairStore } from '../api/pair-store';
 import { DEMO_COMPARISON } from '../data/demo-comparison';
 import { ComparisonView, buildComparison } from '../logic/comparison-engine';
@@ -18,6 +19,7 @@ import { HkModule } from '../ui/module';
 })
 export class ComparePage {
   private readonly pairStore = inject(PairStore);
+  readonly history = inject(HistoryStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -83,6 +85,7 @@ export class ComparePage {
     try {
       const [listA, listB] = await this.pairStore.load(a, b);
       this.view.set(buildComparison(listA, listB));
+      this.history.recordComparison(listA.name, listB.name, this.view().compatScore);
       this.live.set(true);
       this.editing.set(false);
       void this.router.navigate([], {

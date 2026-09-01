@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AnilistService } from '../api/anilist.service';
+import { HistoryStore } from '../api/history-store';
 import { DEMO_GROUP } from '../data/demo-group';
 import { GroupView, buildGroup } from '../logic/group-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
@@ -19,6 +20,7 @@ const MAX_MEMBERS = 5;
 })
 export class GroupsPage {
   private readonly anilist = inject(AnilistService);
+  private readonly history = inject(HistoryStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -92,6 +94,7 @@ export class GroupsPage {
       const lists = await Promise.all(names.map((n) => this.anilist.getUserLists(n)));
       this.members.set(lists.map((l) => l.name));
       this.view.set(buildGroup(lists));
+      this.history.recordGroup(this.members());
       this.syncUrl();
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : 'Loading the group failed.');

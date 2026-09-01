@@ -1,7 +1,7 @@
 <div class="shell">
   <!-- Desktop chrome -->
   <div class="desktop-only">
-    <hk-utility-bar [left]="utilLeft" [right]="utilRight" />
+    <hk-utility-bar [left]="utilLeft" [right]="utilRight()" (actionClick)="onUtilAction($event)" />
     <hk-global-header brand="AniMatch" tagline="for AniList">
       <div class="search-wrap">
         <hk-search-input
@@ -35,7 +35,11 @@
   <div class="mobile-header mobile-only">
     <span class="m-brand">AniMatch</span>
     <span class="m-tagline">for AniList</span>
-    <a href="#" class="m-signin" (click)="$event.preventDefault()">Sign in</a>
+    @if (auth.connected()) {
+      <a routerLink="/profile" class="m-signin">{{ viewer()?.name ?? 'Profile' }}</a>
+    } @else {
+      <a href="#" class="m-signin" (click)="$event.preventDefault(); onUtilAction('connect')">Sign in</a>
+    }
   </div>
 
   <main class="content">

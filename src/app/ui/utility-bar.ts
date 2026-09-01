@@ -1,4 +1,10 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
+
+export interface UtilityItem {
+  label: string;
+  /** Emitted through actionClick when set; plain text link otherwise */
+  action?: string;
+}
 
 @Component({
   selector: 'hk-utility-bar',
@@ -11,8 +17,12 @@ import { Component, input } from '@angular/core';
           }
         </div>
         <div class="side">
-          @for (r of right(); track r) {
-            <a href="#" class="hk-link-quiet" (click)="$event.preventDefault()">{{ r }}</a>
+          @for (r of right(); track r.label) {
+            <a
+              href="#"
+              class="hk-link-quiet"
+              (click)="$event.preventDefault(); r.action && actionClick.emit(r.action)"
+            >{{ r.label }}</a>
           }
         </div>
       </div>
@@ -36,5 +46,6 @@ import { Component, input } from '@angular/core';
 })
 export class HkUtilityBar {
   readonly left = input<string[]>([]);
-  readonly right = input<string[]>([]);
+  readonly right = input<UtilityItem[]>([]);
+  readonly actionClick = output<string>();
 }

@@ -1,13 +1,14 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
-import { AnilistService, AnilistUserHit } from './api/anilist.service';
+import { AnilistService, AnilistUserHit, AnilistViewer } from './api/anilist.service';
+import { AuthService } from './api/auth.service';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
 import { HkSearchInput } from './ui/search-input';
-import { HkUtilityBar } from './ui/utility-bar';
-import { NAV_ITEMS, UTIL_LEFT, UTIL_RIGHT } from './data/animatch-data';
+import { HkUtilityBar, UtilityItem } from './ui/utility-bar';
+import { NAV_ITEMS, UTIL_LEFT } from './data/animatch-data';
 
 @Component({
   selector: 'app-root',
@@ -19,10 +20,21 @@ import { NAV_ITEMS, UTIL_LEFT, UTIL_RIGHT } from './data/animatch-data';
 export class App {
   private readonly router = inject(Router);
   private readonly anilist = inject(AnilistService);
+  readonly auth = inject(AuthService);
 
   readonly utilLeft = UTIL_LEFT;
-  readonly utilRight = UTIL_RIGHT;
   readonly navItems = NAV_ITEMS;
+
+  readonly viewer = signal<AnilistViewer | null>(null);
+
+  readonly utilRight = computed<UtilityItem[]>(() =>
+    this.auth.connected()
+      ? [
+          { label: this.viewer() ? `Signed in as ${this.viewer()!.name}` : 'My profile', action: 'profile' },
+          { label: 'Log out', action: 'logout' },
+        ]
+      : [{ label: 'Connect AniList', action: 'connect' }, { label: 'Sign in', action: 'connect' }],
+  );
 
   readonly searchResults = signal<AnilistUserHit[]>([]);
   readonly searchOpen = signal(false);
@@ -41,6 +53,7 @@ export class App {
     const url = this.url();
     if (url.startsWith('/backlog')) return 'Shared backlog';
     if (url.startsWith('/groups')) return 'Groups';
+    if (url.startsWith('/profile')) return 'My profile';
     return 'Compare';
   });
 
@@ -48,8 +61,32 @@ export class App {
     { label: 'Compare', glyph: '⇄', path: '/compare' },
     { label: 'Backlog', glyph: '≡', path: '/backlog' },
     { label: 'Groups', glyph: '⌂', path: '/groups' },
-    { label: 'Profile', glyph: '○', path: null },
+    { label: 'Profile', glyph: '○', path: '/profile' },
   ];
+
+  constructor() {
+    effect(() => {
+      const token = this.auth.token();
+      if (!token) {
+        this.viewer.set(null);
+        return;
+      }
+      void this.anilist
+        .getViewer(token)
+        .then((v) => this.viewer.set(v))
+        .catch(() => this.auth.logout());
+    });
+  }
+
+  onUtilAction(action: string) {
+    if (action === 'connect') {
+      if (!this.auth.login()) void this.router.navigate(['/profile']);
+    } else if (action === 'profile') {
+      void this.router.navigate(['/profile']);
+    } else if (action === 'logout') {
+      this.auth.logout();
+    }
+  }
 
   onSearchQuery(q: string) {
     if (this.searchTimer) clearTimeout(this.searchTimer);

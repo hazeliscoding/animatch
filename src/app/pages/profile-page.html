@@ -1,0 +1,167 @@
+<div class="page hk-stack">
+  <hk-breadcrumbs [items]="crumbs()" />
+
+  @if (!profile() && !loading()) {
+    <div class="connect-panel">
+      <h1 class="title">My profile</h1>
+      <p class="lead">
+        Connect your AniList account to see your own stats and start comparisons from your profile —
+        or look up any public profile by name.
+      </p>
+      <div class="actions">
+        <hk-button variant="primary" (click)="connect()">Connect AniList</hk-button>
+        <span class="or">or</span>
+        <input
+          class="picker-input"
+          [(ngModel)]="username"
+          placeholder="AniList username"
+          (keyup.enter)="viewUser()"
+        />
+        <hk-button variant="secondary" (click)="viewUser()">View profile</hk-button>
+      </div>
+      @if (error(); as err) {
+        <div class="picker-error">{{ err }}</div>
+      }
+      <details class="advanced">
+        <summary>OAuth client ID (one-time setup)</summary>
+        <p class="hint">
+          Register a client at
+          <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener">anilist.co/settings/developer</a>
+          with redirect URL <code>{{ origin }}/auth/callback</code>, then paste the client ID here.
+        </p>
+        <div class="actions">
+          <input class="picker-input wide" [(ngModel)]="clientIdInput" placeholder="client id" />
+          <hk-button variant="neutral" size="sm" (click)="saveClientId()">Save</hk-button>
+        </div>
+      </details>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">Loading profile…</div>
+  }
+
+  @if (profile(); as p) {
+    <div class="user-card">
+      <div class="avatar">
+        @if (p.avatar) {
+          <img [src]="p.avatar" alt="" />
+        } @else {
+          {{ p.initial }}
+        }
+      </div>
+      <div>
+        <h1 class="title">
+          {{ p.name }}
+          @if (isSelf()) {
+            <span class="you">YOU</span>
+          }
+        </h1>
+        <div class="user-meta">
+          {{ p.completed }} completed · mean {{ p.mean }} ({{ p.scoredCount }} scored) ·
+          {{ p.episodesWatched.toLocaleString() }} episodes watched
+        </div>
+      </div>
+      <div class="card-actions">
+        <hk-button variant="primary" size="sm" [routerLink]="'/compare'" [queryParams]="{ a: p.name }">
+          Compare {{ p.name }} with…
+        </hk-button>
+        @if (isSelf()) {
+          <hk-button variant="ghost" size="sm" (click)="logout()">Log out</hk-button>
+        }
+      </div>
+    </div>
+    @if (error(); as err) {
+      <div class="picker-error">{{ err }}</div>
+    }
+
+    <div class="grid">
+      <div class="col hk-stack">
+        <hk-module title="Lists at a glance" [pad]="true">
+          <div class="glance">
+            <div class="g-row"><span>Completed</span><strong>{{ p.completed }}</strong></div>
+            <div class="g-row"><span>Watching</span><strong>{{ p.watching }}</strong></div>
+            <div class="g-row"><span>Plan to watch</span><strong>{{ p.planning }}</strong></div>
+            <div class="g-row"><span>Paused</span><strong>{{ p.paused }}</strong></div>
+            <div class="g-row"><span>Dropped</span><strong>{{ p.dropped }}</strong></div>
+          </div>
+        </hk-module>
+
+        <hk-module title="Score distribution" [pad]="true">
+          <div class="hist-bars">
+            @for (h of p.hist; track h.bin) {
+              <div class="hist-col"><div class="bar" [style.height.px]="h.px"></div></div>
+            }
+          </div>
+          <div class="hist-bins">
+            @for (h of p.hist; track h.bin) {
+              <div class="bin">{{ h.bin }}</div>
+            }
+          </div>
+        </hk-module>
+
+        <hk-module title="Highest-rated studios" [pad]="true">
+          <div class="glance">
+            @for (s of p.studios; track s.name) {
+              <div class="g-row">
+                <span>{{ s.name }} <span class="muted">({{ s.count }} titles)</span></span>
+                <strong>★ {{ s.mean }}</strong>
+              </div>
+            } @empty {
+              <div class="muted">Not enough scored titles per studio yet.</div>
+            }
+          </div>
+        </hk-module>
+      </div>
+
+      <div class="col hk-stack">
+        <hk-module title="Genre taste" [pad]="true">
+          <div class="genres">
+            @for (g of p.genres; track g.name) {
+              <div class="genre-row">
+                <div class="g-name">{{ g.name }}</div>
+                <div class="meter"><div class="fill" [style.width.%]="g.pct"></div></div>
+                <div class="g-val">
+                  {{ g.pct }}%
+                  @if (g.mean) {
+                    <span class="muted">· ★ {{ g.mean }}</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </hk-module>
+      </div>
+    </div>
+  }
+
+  @if (history.comparisons().length || history.groups().length) {
+    <div class="grid">
+      <hk-module title="Recent comparisons" [pad]="false">
+        <div class="recents">
+          @for (c of history.comparisons(); track c.a + c.b) {
+            <a class="recent" [routerLink]="'/compare'" [queryParams]="{ a: c.a, b: c.b }">
+              <span class="r-names">{{ c.a }} × {{ c.b }}</span>
+              <span class="r-score">{{ c.score }}/100</span>
+              <span class="r-when">{{ rel(c.at) }}</span>
+            </a>
+          } @empty {
+            <div class="recent muted none">No comparisons yet.</div>
+          }
+        </div>
+      </hk-module>
+      <hk-module title="Recent groups" [pad]="false">
+        <div class="recents">
+          @for (g of history.groups(); track g.users.join()) {
+            <a class="recent" [routerLink]="'/groups'" [queryParams]="{ users: g.users.join(',') }">
+              <span class="r-names">{{ g.users.join(', ') }}</span>
+              <span class="r-when">{{ rel(g.at) }}</span>
+            </a>
+          } @empty {
+            <div class="recent muted none">No groups yet.</div>
+          }
+        </div>
+      </hk-module>
+    </div>
+  }
+</div>

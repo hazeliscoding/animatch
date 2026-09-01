@@ -24,7 +24,7 @@ export const NAV_ITEMS = [
   { label: 'Shared backlog', path: '/backlog' },
   { label: 'Groups', path: '/groups' },
   { label: 'Recommendations' },
-  { label: 'My profile' },
+  { label: 'My profile', path: '/profile' },
 ];
 
 export interface BreakdownItem {

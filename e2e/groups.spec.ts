@@ -16,7 +16,7 @@ const mockAnilist = async (page: import('@playwright/test').Page) => {
 test('builds a real group from the member picker', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/groups');
-  await expect(page.getByText('Showing demo data', { exact: false })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Build a watch club' })).toBeVisible();
 
   await page.getByPlaceholder('AniList username').fill('alice');
   await page.getByRole('button', { name: '+ Add member' }).click();
@@ -39,12 +39,11 @@ test('loads a group from ?users= and supports member removal', async ({ page }) 
   await mockAnilist(page);
   await page.goto('/groups?users=alice,bob');
   await expect(page.getByRole('columnheader', { name: 'alice' })).toBeVisible();
-  await expect(page.getByText('Showing demo data', { exact: false })).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Remove bob' }).click();
-  // below two members the page returns to demo state
-  await expect(page.getByText('Showing demo data', { exact: false })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /Saturday watch club/ })).toBeVisible();
+  // below two members the page returns to the empty state
+  await expect(page.getByRole('heading', { name: 'Build a watch club' })).toBeVisible();
+  await expect(page.getByRole('columnheader', { name: 'alice' })).toHaveCount(0);
 });
 
 test('unknown member surfaces an error and keeps demo data', async ({ page }) => {
@@ -55,5 +54,4 @@ test('unknown member surfaces an error and keeps demo data', async ({ page }) =>
   await page.getByPlaceholder('AniList username').fill('ghost-user');
   await page.getByRole('button', { name: '+ Add member' }).click();
   await expect(page.locator('.picker-error')).toContainText('not found');
-  await expect(page.getByRole('columnheader', { name: 'yuki_47' })).toBeVisible();
 });

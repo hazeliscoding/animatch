@@ -3,7 +3,6 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_PAIR } from '../anilist.config';
 import { PairStore } from '../api/pair-store';
-import { DEMO_BACKLOG } from '../data/demo-backlog';
 import {
   BacklogSort,
   BacklogView,
@@ -41,31 +40,32 @@ export class BacklogPage {
   nameB = '';
   readonly samplePair = SAMPLE_PAIR;
 
-  loadSample() {
-    this.nameA = SAMPLE_PAIR.a;
-    this.nameB = SAMPLE_PAIR.b;
-    void this.load();
-  }
-
   readonly live = computed(() => this.view() !== null);
-  readonly display = computed(() => this.view() ?? DEMO_BACKLOG);
 
-  readonly tabs = computed<TabItem[]>(() => [
-    { label: 'Both plan to watch', count: this.display().bothCount },
-    { label: 'Only in one backlog', count: this.display().onlyOneCount },
-    { label: 'Watching together', count: this.display().watchingCount },
-  ]);
+  readonly tabs = computed<TabItem[]>(() => {
+    const d = this.view();
+    if (!d) return [];
+    return [
+      { label: 'Both plan to watch', count: d.bothCount },
+      { label: 'Only in one backlog', count: d.onlyOneCount },
+      { label: 'Watching together', count: d.watchingCount },
+    ];
+  });
 
-  readonly sortedItems = computed(() => sortBacklogItems(this.display().items, this.sort()));
+  readonly sortedItems = computed(() => {
+    const d = this.view();
+    return d ? sortBacklogItems(d.items, this.sort()) : [];
+  });
   readonly visibleItems = computed(() =>
     this.showAll() ? this.sortedItems() : this.sortedItems().slice(0, VISIBLE_LIMIT),
   );
   readonly hiddenCount = computed(() => this.sortedItems().length - this.visibleItems().length);
-  readonly visibleOnlyOne = computed(() => this.display().onlyOne.slice(0, 12));
+  readonly visibleOnlyOne = computed(() => this.view()?.onlyOne.slice(0, 12) ?? []);
 
-  readonly segBoth = computed(() => this.display().overlapPct);
+  readonly segBoth = computed(() => this.view()?.overlapPct ?? 0);
   readonly segOne = computed(() => {
-    const d = this.display();
+    const d = this.view();
+    if (!d) return 0;
     const union = d.planningA + d.planningB - d.bothPlanned;
     return union === 0 ? 0 : Math.round(((d.planningA - d.bothPlanned) / union) * 100);
   });
@@ -87,6 +87,12 @@ export class BacklogPage {
       this.nameB = b;
       void this.load();
     }
+  }
+
+  loadSample() {
+    this.nameA = SAMPLE_PAIR.a;
+    this.nameB = SAMPLE_PAIR.b;
+    void this.load();
   }
 
   async load() {

@@ -1,8 +1,7 @@
 // Single-user profile stats from a full AniList list.
 
 import { AnilistUserList } from '../api/anilist.service';
-import { HistBin } from '../data/animatch-data';
-import { completedOf, histogram } from './comparison-engine';
+import { HistBin, completedOf, histogram } from './comparison-engine';
 
 export interface ProfileGenreRow {
   name: string;

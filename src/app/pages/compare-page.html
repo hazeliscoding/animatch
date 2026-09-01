@@ -10,6 +10,7 @@
           class="picker-input"
           [(ngModel)]="nameA"
           placeholder="first username"
+          aria-label="First AniList username"
           [disabled]="loading()"
           (keyup.enter)="compare()"
         />
@@ -18,6 +19,7 @@
           class="picker-input"
           [(ngModel)]="nameB"
           placeholder="second username"
+          aria-label="Second AniList username"
           [disabled]="loading()"
           (keyup.enter)="compare()"
         />
@@ -26,11 +28,11 @@
         </hk-button>
       </div>
       @if (error(); as err) {
-        <div class="picker-error">{{ err }}</div>
+        <div class="picker-error" role="alert">{{ err }}</div>
       } @else if (!live()) {
         <div class="picker-note">
-          Showing demo data until you compare two real users —
-          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+          Any two public profiles work —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">or load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
         </div>
       }
       @if (!live() && history.comparisons().length) {
@@ -48,236 +50,239 @@
     </div>
   }
 
-  <!-- Desktop duo panel -->
-  <div class="duo-panel desktop-only">
-    <div class="user">
-      <div class="avatar a">
-        @if (view().userA.avatar; as av) {
-          <img [src]="av" alt="" />
-        } @else {
-          {{ view().userA.initial }}
-        }
-      </div>
-      <div>
-        <div class="user-name">
-          {{ view().userA.name }}
-          @if (!live()) {
-            <span class="demo-badge">DEMO</span>
+  @if (view(); as v) {
+    <!-- Desktop duo panel -->
+    <div class="duo-panel desktop-only">
+      <div class="user">
+        <div class="avatar a">
+          @if (v.userA.avatar; as av) {
+            <img [src]="av" alt="" />
+          } @else {
+            {{ v.userA.initial }}
           }
         </div>
-        <div class="user-meta">{{ view().userA.completed }} completed · mean {{ view().userA.mean }}</div>
+        <div>
+          <div class="user-name">{{ v.userA.name }}</div>
+          <div class="user-meta">{{ v.userA.completed }} completed · mean {{ v.userA.mean }}</div>
+        </div>
       </div>
-    </div>
-    <div class="vs">×</div>
-    <div class="user">
-      <div class="avatar b">
-        @if (view().userB.avatar; as av) {
-          <img [src]="av" alt="" />
-        } @else {
-          {{ view().userB.initial }}
-        }
-      </div>
-      <div>
-        <div class="user-name">{{ view().userB.name }}</div>
-        <div class="user-meta">{{ view().userB.completed }} completed · mean {{ view().userB.mean }}</div>
-      </div>
-    </div>
-    <div class="score-side">
-      <div class="score-block">
-        <div class="score-label">Taste match</div>
-        <div class="score">{{ view().compatScore }}<span class="score-max">/100</span></div>
-        <div class="score-bar"><div class="fill" [style.width.%]="view().compatScore"></div></div>
-      </div>
-      <hk-button variant="secondary" size="sm" (click)="editing.set(!editing())">Change user</hk-button>
-    </div>
-  </div>
-
-  <!-- Mobile summary card -->
-  <div class="mobile-summary mobile-only">
-    <div class="row">
-      <div class="avatar sm a">
-        @if (view().userA.avatar; as av) {
-          <img [src]="av" alt="" />
-        } @else {
-          {{ view().userA.initial }}
-        }
-      </div>
-      <div class="names">
-        {{ view().userA.name }} <span class="x">×</span> {{ view().userB.name }}
-        @if (!live()) {
-          <span class="demo-badge">DEMO</span>
-        }
-      </div>
-      <div class="avatar sm b right">
-        @if (view().userB.avatar; as av) {
-          <img [src]="av" alt="" />
-        } @else {
-          {{ view().userB.initial }}
-        }
-      </div>
-    </div>
-    <div class="score-row">
-      <span class="score-big">{{ view().compatScore }}</span>
-      <span class="score-note">/100 taste match</span>
-    </div>
-    <div class="score-bar"><div class="fill" [style.width.%]="view().compatScore"></div></div>
-  </div>
-
-  <div class="columns">
-    <div class="col hk-stack">
-      <hk-module title="Compatibility breakdown" [pad]="true" class="desktop-only">
-        <div class="breakdown">
-          @for (b of view().breakdown; track b.label) {
-            <div class="b-row">
-              <div class="b-label">{{ b.label }}<div class="b-note">{{ b.note }}</div></div>
-              <div class="meter"><div class="fill" [style.width.%]="b.pct"></div></div>
-              <div class="b-val">{{ b.val }}</div>
-            </div>
+      <div class="vs">×</div>
+      <div class="user">
+        <div class="avatar b">
+          @if (v.userB.avatar; as av) {
+            <img [src]="av" alt="" />
+          } @else {
+            {{ v.userB.initial }}
           }
         </div>
-      </hk-module>
-
-      <hk-module title="Breakdown" [pad]="true" class="mobile-only">
-        <div class="breakdown-mobile">
-          @for (b of view().breakdown; track b.label) {
-            <div class="bm-row">
-              <div>
-                <div class="b-label">{{ b.label }}</div>
-                <div class="meter thin"><div class="fill" [style.width.%]="b.pct"></div></div>
-              </div>
-              <div class="b-val">{{ b.val }}</div>
-            </div>
-          }
+        <div>
+          <div class="user-name">{{ v.userB.name }}</div>
+          <div class="user-meta">{{ v.userB.completed }} completed · mean {{ v.userB.mean }}</div>
         </div>
-      </hk-module>
-
-      <hk-module title="Biggest disagreements" [action]="'All ' + view().disagreementTotal" class="desktop-only">
-        <div class="dis-list">
-          @for (d of view().disagreements; track d.title) {
-            <div class="dis-row">
-              <div class="poster">
-                @if (d.cover) {
-                  <img [src]="d.cover" alt="" />
-                } @else {
-                  IMG
-                }
-              </div>
-              <div class="dis-main">
-                <a href="#" (click)="$event.preventDefault()" class="dis-title">{{ d.title }}</a>
-                <div class="dis-meta">{{ d.meta }}</div>
-              </div>
-              <div class="dis-scores">
-                <span class="sc-a">{{ d.a }}</span>
-                <span class="sc-vs">vs</span>
-                <span class="sc-b">{{ d.b }}</span>
-              </div>
-              <span class="delta">Δ {{ d.diff }}</span>
-            </div>
-          }
+      </div>
+      <div class="score-side">
+        <div class="score-block">
+          <div class="score-label">Taste match</div>
+          <div class="score">{{ v.compatScore }}<span class="score-max">/100</span></div>
+          <div class="score-bar"><div class="fill" [style.width.%]="v.compatScore"></div></div>
         </div>
-      </hk-module>
-
-      <hk-module title="Biggest disagreements" [action]="'' + view().disagreementTotal" class="mobile-only">
-        <div class="dis-list">
-          @for (d of view().disagreements.slice(0, 3); track d.title) {
-            <div class="dis-row compact">
-              <div class="dis-main">
-                <a href="#" (click)="$event.preventDefault()" class="dis-title sm">{{ d.title }}</a>
-              </div>
-              <span class="sc-a sm">{{ d.a }}</span>
-              <span class="sc-vs">vs</span>
-              <span class="sc-b sm">{{ d.b }}</span>
-              <span class="delta sm">Δ {{ d.diff }}</span>
-            </div>
-          }
-        </div>
-      </hk-module>
-
-      <hk-module title="Score distribution" [pad]="true" class="desktop-only">
-        <div class="hists">
-          <div>
-            <div class="hist-title a">{{ view().userA.name }}</div>
-            <div class="hist-bars">
-              @for (h of view().histA; track h.bin) {
-                <div class="hist-col"><div class="bar a" [style.height.px]="h.px"></div></div>
-              }
-            </div>
-            <div class="hist-bins">
-              @for (h of view().histA; track h.bin) {
-                <div class="bin">{{ h.bin }}</div>
-              }
-            </div>
-          </div>
-          <div>
-            <div class="hist-title b">{{ view().userB.name }}</div>
-            <div class="hist-bars">
-              @for (h of view().histB; track h.bin) {
-                <div class="hist-col"><div class="bar b" [style.height.px]="h.px"></div></div>
-              }
-            </div>
-            <div class="hist-bins">
-              @for (h of view().histB; track h.bin) {
-                <div class="bin">{{ h.bin }}</div>
-              }
-            </div>
-          </div>
-        </div>
-      </hk-module>
+        <hk-button variant="secondary" size="sm" (click)="editing.set(!editing())">Change user</hk-button>
+      </div>
     </div>
 
-    <div class="col hk-stack desktop-only">
-      <hk-module title="Shared anime · both scored" [action]="'All ' + view().sharedTotal">
-        <hk-data-table [columns]="sharedCols()" [rows]="view().sharedRows" [footer]="view().sharedFooter" />
-      </hk-module>
-
-      <hk-module title="Genre taste profile" [pad]="true">
-        <div class="legend">
-          <span class="key"><span class="swatch a"></span>{{ view().userA.name }}</span>
-          <span class="key"><span class="swatch b"></span>{{ view().userB.name }}</span>
-          <span class="legend-note">% of each user's completed list</span>
-          <span class="view-toggle" role="tablist" aria-label="Genre profile view">
-            <button
-              type="button"
-              role="tab"
-              [attr.aria-selected]="genreView() === 'bars'"
-              class="vt"
-              [class.sel]="genreView() === 'bars'"
-              (click)="genreView.set('bars')"
-            >Bars</button>
-            <span class="vt-sep">|</span>
-            <button
-              type="button"
-              role="tab"
-              [attr.aria-selected]="genreView() === 'radar'"
-              class="vt"
-              [class.sel]="genreView() === 'radar'"
-              (click)="genreView.set('radar')"
-            >Radar</button>
-          </span>
+    <!-- Mobile summary card -->
+    <div class="mobile-summary mobile-only">
+      <div class="row">
+        <div class="avatar sm a">
+          @if (v.userA.avatar; as av) {
+            <img [src]="av" alt="" />
+          } @else {
+            {{ v.userA.initial }}
+          }
         </div>
-        @if (genreView() === 'bars') {
-          <div class="genres">
-            @for (g of view().genres; track g.name) {
-              <div class="g-row">
-                <div class="g-name">{{ g.name }}</div>
-                <div class="g-bars">
-                  <div class="meter flat"><div class="fill a" [style.width.%]="g.aPct"></div></div>
-                  <div class="meter flat"><div class="fill b" [style.width.%]="g.bPct"></div></div>
-                </div>
-                <div class="g-pcts">{{ g.pcts }}</div>
+        <div class="names">{{ v.userA.name }} <span class="x">×</span> {{ v.userB.name }}</div>
+        <div class="avatar sm b right">
+          @if (v.userB.avatar; as av) {
+            <img [src]="av" alt="" />
+          } @else {
+            {{ v.userB.initial }}
+          }
+        </div>
+      </div>
+      <div class="score-row">
+        <span class="score-big">{{ v.compatScore }}</span>
+        <span class="score-note">/100 taste match</span>
+      </div>
+      <div class="score-bar"><div class="fill" [style.width.%]="v.compatScore"></div></div>
+    </div>
+
+    <div class="columns">
+      <div class="col hk-stack">
+        <hk-module title="Compatibility breakdown" [pad]="true" class="desktop-only">
+          <div class="breakdown">
+            @for (b of v.breakdown; track b.label) {
+              <div class="b-row">
+                <div class="b-label">{{ b.label }}<div class="b-note">{{ b.note }}</div></div>
+                <div class="meter"><div class="fill" [style.width.%]="b.pct"></div></div>
+                <div class="b-val">{{ b.val }}</div>
               </div>
             }
           </div>
-        } @else {
-          <hk-genre-radar [genres]="view().genres" [nameA]="view().userA.name" [nameB]="view().userB.name" />
-        }
-      </hk-module>
-    </div>
-  </div>
+        </hk-module>
 
-  <!-- Mobile backlog CTA -->
-  <div class="backlog-cta mobile-only">
-    <div class="cta-text"><strong>34 titles</strong> in both backlogs</div>
-    <hk-button variant="primary" size="sm">Shared backlog →</hk-button>
-  </div>
+        <hk-module title="Breakdown" [pad]="true" class="mobile-only">
+          <div class="breakdown-mobile">
+            @for (b of v.breakdown; track b.label) {
+              <div class="bm-row">
+                <div>
+                  <div class="b-label">{{ b.label }}</div>
+                  <div class="meter thin"><div class="fill" [style.width.%]="b.pct"></div></div>
+                </div>
+                <div class="b-val">{{ b.val }}</div>
+              </div>
+            }
+          </div>
+        </hk-module>
+
+        <hk-module title="Biggest disagreements" [action]="'All ' + v.disagreementTotal" class="desktop-only">
+          <div class="dis-list">
+            @for (d of v.disagreements; track d.title) {
+              <div class="dis-row">
+                <div class="poster">
+                  @if (d.cover) {
+                    <img [src]="d.cover" alt="" />
+                  } @else {
+                    IMG
+                  }
+                </div>
+                <div class="dis-main">
+                  <a href="#" (click)="$event.preventDefault()" class="dis-title">{{ d.title }}</a>
+                  <div class="dis-meta">{{ d.meta }}</div>
+                </div>
+                <div class="dis-scores">
+                  <span class="sc-a">{{ d.a }}</span>
+                  <span class="sc-vs">vs</span>
+                  <span class="sc-b">{{ d.b }}</span>
+                </div>
+                <span class="delta">Δ {{ d.diff }}</span>
+              </div>
+            }
+          </div>
+        </hk-module>
+
+        <hk-module title="Biggest disagreements" [action]="'' + v.disagreementTotal" class="mobile-only">
+          <div class="dis-list">
+            @for (d of v.disagreements.slice(0, 3); track d.title) {
+              <div class="dis-row compact">
+                <div class="dis-main">
+                  <a href="#" (click)="$event.preventDefault()" class="dis-title sm">{{ d.title }}</a>
+                </div>
+                <span class="sc-a sm">{{ d.a }}</span>
+                <span class="sc-vs">vs</span>
+                <span class="sc-b sm">{{ d.b }}</span>
+                <span class="delta sm">Δ {{ d.diff }}</span>
+              </div>
+            }
+          </div>
+        </hk-module>
+
+        <hk-module title="Score distribution" [pad]="true" class="desktop-only">
+          <div class="hists">
+            <div>
+              <div class="hist-title a">{{ v.userA.name }}</div>
+              <div class="hist-bars">
+                @for (h of v.histA; track h.bin) {
+                  <div class="hist-col"><div class="bar a" [style.height.px]="h.px"></div></div>
+                }
+              </div>
+              <div class="hist-bins">
+                @for (h of v.histA; track h.bin) {
+                  <div class="bin">{{ h.bin }}</div>
+                }
+              </div>
+            </div>
+            <div>
+              <div class="hist-title b">{{ v.userB.name }}</div>
+              <div class="hist-bars">
+                @for (h of v.histB; track h.bin) {
+                  <div class="hist-col"><div class="bar b" [style.height.px]="h.px"></div></div>
+                }
+              </div>
+              <div class="hist-bins">
+                @for (h of v.histB; track h.bin) {
+                  <div class="bin">{{ h.bin }}</div>
+                }
+              </div>
+            </div>
+          </div>
+        </hk-module>
+      </div>
+
+      <div class="col hk-stack desktop-only">
+        <hk-module title="Shared anime · both scored" [action]="'All ' + v.sharedTotal">
+          <hk-data-table [columns]="sharedCols()" [rows]="v.sharedRows" [footer]="v.sharedFooter" />
+        </hk-module>
+
+        <hk-module title="Genre taste profile" [pad]="true">
+          <div class="legend">
+            <span class="key"><span class="swatch a"></span>{{ v.userA.name }}</span>
+            <span class="key"><span class="swatch b"></span>{{ v.userB.name }}</span>
+            <span class="legend-note">% of each user's completed list</span>
+            <span class="view-toggle" role="tablist" aria-label="Genre profile view">
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="genreView() === 'bars'"
+                class="vt"
+                [class.sel]="genreView() === 'bars'"
+                (click)="genreView.set('bars')"
+              >Bars</button>
+              <span class="vt-sep">|</span>
+              <button
+                type="button"
+                role="tab"
+                [attr.aria-selected]="genreView() === 'radar'"
+                class="vt"
+                [class.sel]="genreView() === 'radar'"
+                (click)="genreView.set('radar')"
+              >Radar</button>
+            </span>
+          </div>
+          @if (genreView() === 'bars') {
+            <div class="genres">
+              @for (g of v.genres; track g.name) {
+                <div class="g-row">
+                  <div class="g-name">{{ g.name }}</div>
+                  <div class="g-bars">
+                    <div class="meter flat"><div class="fill a" [style.width.%]="g.aPct"></div></div>
+                    <div class="meter flat"><div class="fill b" [style.width.%]="g.bPct"></div></div>
+                  </div>
+                  <div class="g-pcts">{{ g.pcts }}</div>
+                </div>
+              }
+            </div>
+          } @else {
+            <hk-genre-radar [genres]="v.genres" [nameA]="v.userA.name" [nameB]="v.userB.name" />
+          }
+        </hk-module>
+      </div>
+    </div>
+
+    <!-- Mobile backlog CTA -->
+    <div class="backlog-cta mobile-only">
+      <div class="cta-text">See what's in both backlogs</div>
+      <hk-button variant="primary" size="sm" routerLink="/backlog" queryParamsHandling="preserve">Shared backlog →</hk-button>
+    </div>
+  } @else if (!loading()) {
+    <div class="empty-state">
+      <h1 class="empty-title">Pick two users to compare</h1>
+      <p class="empty-text">
+        You'll get a 0–100 taste match with the full breakdown: score correlation, genre overlap,
+        biggest disagreements, score distributions, and every title you've both seen.
+      </p>
+      <hk-button variant="secondary" size="sm" (click)="loadSample()">
+        Load a live sample ({{ samplePair.a }} × {{ samplePair.b }})
+      </hk-button>
+    </div>
+  }
 </div>

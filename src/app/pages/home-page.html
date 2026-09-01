@@ -29,8 +29,6 @@
       <a routerLink="/compare" [queryParams]="{ a: samplePair.a, b: samplePair.b }"
         >Try it live: {{ samplePair.a }} × {{ samplePair.b }} →</a
       >
-      <span class="dot">·</span>
-      <a routerLink="/compare">See a demo comparison →</a>
       @if (!auth.connected()) {
         <span class="dot">·</span>
         <a routerLink="/profile">Connect your AniList account →</a>
@@ -74,6 +72,6 @@
   </section>
 
   <p class="foot-note">
-    Works with public AniList data — no account needed. Every page shows labeled demo data until you load real users.
+    Works with public AniList data — no account needed to compare, browse backlogs, or get recommendations.
   </p>
 </div>

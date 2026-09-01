@@ -29,14 +29,14 @@ test('nav links stay visible and functional while navigating', async ({ page }) 
   );
 
   await nav.getByRole('link', { name: 'Groups' }).click();
-  await expect(page.getByRole('heading', { name: /Saturday watch club/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Watch group/ })).toBeVisible();
   await expect(nav.getByRole('link', { name: 'Shared backlog', exact: true })).toHaveCSS(
     'color',
     'rgb(255, 255, 255)',
   );
 
   await nav.getByRole('link', { name: 'Compare', exact: true }).click();
-  await expect(page.getByText('Taste match', { exact: true })).toBeVisible();
+  await expect(page.getByText('Compare two AniList users')).toBeVisible();
 });
 
 test('active nav item tracks the current route', async ({ page }) => {

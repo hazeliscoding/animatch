@@ -4,11 +4,10 @@ import { Router, RouterLink } from '@angular/router';
 import { SAMPLE_PAIR } from '../anilist.config';
 import { AuthService } from '../api/auth.service';
 import { HistoryStore, relativeTime } from '../api/history-store';
-import { HkButton } from '../ui/button';
 
 @Component({
   selector: 'app-home-page',
-  imports: [FormsModule, RouterLink, HkButton],
+  imports: [FormsModule, RouterLink],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css',
 })

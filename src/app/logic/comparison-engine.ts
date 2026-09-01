@@ -3,8 +3,33 @@
 // 15% completed overlap, 10% studio affinity — mirroring the breakdown UI.
 
 import { AnimeEntry, AnilistUserList } from '../api/anilist.service';
-import { BreakdownItem, GenreRow, HistBin, UserSummary } from '../data/animatch-data';
 import { TableRow } from '../ui/data-table';
+
+export interface UserSummary {
+  name: string;
+  initial: string;
+  completed: number;
+  mean: number;
+}
+
+export interface BreakdownItem {
+  label: string;
+  note: string;
+  pct: number;
+  val: string;
+}
+
+export interface HistBin {
+  bin: number;
+  px: number;
+}
+
+export interface GenreRow {
+  name: string;
+  aPct: number;
+  bPct: number;
+  pcts: string;
+}
 
 export interface DisagreementView {
   title: string;

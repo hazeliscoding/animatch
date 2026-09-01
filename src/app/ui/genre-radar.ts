@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { GenreRow } from '../data/animatch-data';
+import { GenreRow } from '../logic/comparison-engine';
 
 interface Vertex {
   x: number;

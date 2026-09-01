@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_GROUP } from '../anilist.config';
 import { AnilistService } from '../api/anilist.service';
 import { HistoryStore } from '../api/history-store';
-import { DEMO_GROUP } from '../data/demo-group';
 import { GroupView, buildGroup } from '../logic/group-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
@@ -33,11 +32,7 @@ export class GroupsPage {
   newMember = '';
 
   readonly live = computed(() => this.view() !== null);
-  readonly display = computed(() => this.view() ?? DEMO_GROUP);
-  readonly groupName = computed(() => (this.live() ? 'Watch group' : 'Saturday watch club'));
-  readonly memberCount = computed(() =>
-    this.live() ? this.view()!.users.length : this.members().length || 4,
-  );
+  readonly memberCount = computed(() => this.view()?.users.length ?? this.members().length);
   readonly canAdd = computed(() => this.members().length < MAX_MEMBERS);
 
   readonly crumbs = [

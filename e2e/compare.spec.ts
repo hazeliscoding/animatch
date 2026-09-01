@@ -2,13 +2,13 @@ import { expect, test } from '@playwright/test';
 
 import { FIXTURES } from './fixtures';
 
-test('demo comparison renders until real users are compared', async ({ page }) => {
+test('empty state prompts for users instead of showing fake data', async ({ page }) => {
   await page.goto('/compare');
-  await expect(page.getByText('Showing demo data')).toBeVisible();
-  await expect(page.locator('.score')).toHaveText(/78\s*\/100/);
-  await expect(page.locator('.user-name').first()).toHaveText(/yuki_47/);
-  await expect(page.getByRole('heading', { name: 'Compatibility breakdown' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Genre taste profile' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Pick two users to compare' })).toBeVisible();
+  await expect(page.getByPlaceholder('first username')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Load a live sample/ })).toBeVisible();
+  await expect(page.locator('.score')).toHaveCount(0);
+  await expect(page.locator('.user-name')).toHaveCount(0);
 });
 
 test('empty submit shows a validation error', async ({ page }) => {
@@ -42,10 +42,9 @@ test('comparing two users renders live data (AniList mocked)', async ({ page }) 
   // 2 titles scored by both users
   await expect(page.getByText('All 2 →')).toBeVisible();
   await expect(page).toHaveURL(/a=alice&b=bob/);
-  await expect(page.getByText('Showing demo data')).toHaveCount(0);
 });
 
-test('unknown user surfaces a friendly error and keeps demo data', async ({ page }) => {
+test('unknown user surfaces a friendly error and stays on the empty state', async ({ page }) => {
   await page.route('https://graphql.anilist.co/**', (route) =>
     route.fulfill({ status: 404, json: { errors: [{ message: 'User not found' }] } }),
   );
@@ -54,5 +53,5 @@ test('unknown user surfaces a friendly error and keeps demo data', async ({ page
   await page.getByPlaceholder('second username').fill('also-nobody');
   await page.getByRole('button', { name: 'Compare', exact: true }).click();
   await expect(page.locator('.picker-error')).toContainText('not found');
-  await expect(page.locator('.user-name').first()).toHaveText(/yuki_47/);
+  await expect(page.locator('.user-name')).toHaveCount(0);
 });

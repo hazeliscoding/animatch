@@ -1,7 +1,10 @@
 <div class="page hk-stack">
   <hk-breadcrumbs [items]="crumbs" />
   <h1 class="title">
-    Shared backlog <span class="subtitle">{{ display().nameA }} × {{ display().nameB }}</span>
+    Shared backlog
+    @if (view(); as d) {
+      <span class="subtitle">{{ d.nameA }} × {{ d.nameB }}</span>
+    }
   </h1>
 
   @if (!live()) {
@@ -12,6 +15,7 @@
           class="picker-input"
           [(ngModel)]="nameA"
           placeholder="first username"
+          aria-label="First AniList username"
           [disabled]="loading()"
           (keyup.enter)="load()"
         />
@@ -20,6 +24,7 @@
           class="picker-input"
           [(ngModel)]="nameB"
           placeholder="second username"
+          aria-label="Second AniList username"
           [disabled]="loading()"
           (keyup.enter)="load()"
         />
@@ -28,66 +33,66 @@
         </hk-button>
       </div>
       @if (error(); as err) {
-        <div class="picker-error">{{ err }}</div>
+        <div class="picker-error" role="alert">{{ err }}</div>
       } @else {
         <div class="picker-note">
-          Showing demo data until you load two real users —
-          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+          Any two public profiles work —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">or load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
         </div>
       }
     </div>
   }
 
-  <hk-tabs [items]="tabs()" [active]="activeTab()" (change)="activeTab.set($event)" />
+  @if (view(); as d) {
+    <hk-tabs [items]="tabs()" [active]="activeTab()" (change)="activeTab.set($event)" />
 
-  <div class="layout">
-    <div class="list-panel">
-      @if (activeTab() === 'Both plan to watch') {
-        <div class="list-head">
-          <span class="count"><strong>{{ display().bothCount }} titles</strong> in both plan-to-watch lists</span>
-          <span class="sort-label">Sort:</span>
-          @for (s of sorts; track s) {
-            <a
-              href="#"
-              class="sort-link"
-              [class.active]="sort() === s"
-              (click)="$event.preventDefault(); sort.set(s)"
-            >{{ s }}</a>
-          }
-        </div>
-        @for (k of visibleItems(); track k.title) {
-          <div class="item">
-            <div class="poster">
-              @if (k.cover) {
-                <img [src]="k.cover" alt="" />
-              } @else {
-                IMG
-              }
-            </div>
-            <div class="main">
-              <div class="title-row">
-                <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
-                <span class="chip" [class]="'chip-' + k.chipKind">{{ k.chip }}</span>
+    <div class="layout">
+      <div class="list-panel">
+        @if (activeTab() === 'Both plan to watch') {
+          <div class="list-head">
+            <span class="count"><strong>{{ d.bothCount }} titles</strong> in both plan-to-watch lists</span>
+            <span class="sort-label">Sort:</span>
+            @for (s of sorts; track s) {
+              <a
+                href="#"
+                class="sort-link"
+                [class.active]="sort() === s"
+                (click)="$event.preventDefault(); sort.set(s)"
+              >{{ s }}</a>
+            }
+          </div>
+          @for (k of visibleItems(); track k.title) {
+            <div class="item">
+              <div class="poster">
+                @if (k.cover) {
+                  <img [src]="k.cover" alt="" />
+                } @else {
+                  IMG
+                }
               </div>
-              <div class="meta">{{ k.meta }}</div>
-              <div class="note">{{ k.note }}</div>
+              <div class="main">
+                <div class="title-row">
+                  <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
+                  <span class="chip" [class]="'chip-' + k.chipKind">{{ k.chip }}</span>
+                </div>
+                <div class="meta">{{ k.meta }}</div>
+                <div class="note">{{ k.note }}</div>
+              </div>
+              <div class="predicted">
+                <div class="predicted-label">Predicted mutual</div>
+                <div class="predicted-score">★ {{ fmt(k.predicted) }}</div>
+              </div>
+              <hk-button variant="ghost" size="sm">Queue →</hk-button>
             </div>
-            <div class="predicted">
-              <div class="predicted-label">Predicted mutual</div>
-              <div class="predicted-score">★ {{ fmt(k.predicted) }}</div>
+          } @empty {
+            <div class="placeholder">No titles in both plan-to-watch lists yet.</div>
+          }
+          @if (hiddenCount() > 0) {
+            <div class="show-all">
+              <a href="#" (click)="$event.preventDefault(); showAll.set(true)">Show all {{ sortedItems().length }} →</a>
             </div>
-            <hk-button variant="ghost" size="sm">Queue →</hk-button>
-          </div>
-        } @empty {
-          <div class="placeholder">No titles in both plan-to-watch lists yet.</div>
-        }
-        @if (hiddenCount() > 0) {
-          <div class="show-all">
-            <a href="#" (click)="$event.preventDefault(); showAll.set(true)">Show all {{ sortedItems().length }} →</a>
-          </div>
-        }
-      } @else if (activeTab() === 'Only in one backlog') {
-        @if (live()) {
+          }
+        } @else if (activeTab() === 'Only in one backlog') {
           @for (k of visibleOnlyOne(); track k.title) {
             <div class="item">
               <div class="poster">
@@ -106,15 +111,11 @@
           } @empty {
             <div class="placeholder">Every planned title is shared — impressive.</div>
           }
-          @if (display().onlyOneCount > visibleOnlyOne().length) {
-            <div class="show-all muted">Showing 12 of {{ display().onlyOneCount }} (most popular first)</div>
+          @if (d.onlyOneCount > visibleOnlyOne().length) {
+            <div class="show-all muted">Showing 12 of {{ d.onlyOneCount }} (most popular first)</div>
           }
         } @else {
-          <div class="placeholder">Connect AniList to populate “{{ activeTab() }}”.</div>
-        }
-      } @else {
-        @if (live()) {
-          @for (k of display().watching; track k.title) {
+          @for (k of d.watching; track k.title) {
             <div class="item">
               <div class="poster">
                 @if (k.cover) {
@@ -132,44 +133,53 @@
           } @empty {
             <div class="placeholder">Nothing currently airing together.</div>
           }
-        } @else {
-          <div class="placeholder">Connect AniList to populate “{{ activeTab() }}”.</div>
         }
-      }
-    </div>
+      </div>
 
-    <div class="rail hk-stack">
-      <hk-module title="Watch-together picks" accent="tint" [pad]="true">
-        <div class="picks">
-          @for (p of display().picks; track p.rank) {
-            <div class="pick">
-              <span class="medal" [class]="'medal-' + p.medal">{{ p.rank }}</span>
-              <div class="pick-main">
-                <a href="#" (click)="$event.preventDefault()" class="pick-title">{{ p.title }}</a>
-                <div class="pick-reason">{{ p.reason }}</div>
+      <div class="rail hk-stack">
+        <hk-module title="Watch-together picks" accent="tint" [pad]="true">
+          <div class="picks">
+            @for (p of d.picks; track p.rank) {
+              <div class="pick">
+                <span class="medal" [class]="'medal-' + p.medal">{{ p.rank }}</span>
+                <div class="pick-main">
+                  <a href="#" (click)="$event.preventDefault()" class="pick-title">{{ p.title }}</a>
+                  <div class="pick-reason">{{ p.reason }}</div>
+                </div>
               </div>
-            </div>
-          } @empty {
-            <div class="placeholder">Load two backlogs to get picks.</div>
-          }
-        </div>
-      </hk-module>
+            } @empty {
+              <div class="placeholder">No shared plans yet — picks appear once your backlogs overlap.</div>
+            }
+          </div>
+        </hk-module>
 
-      <hk-module title="Backlog overlap" [pad]="true">
-        <div class="overlap">
-          <div class="o-row"><span>{{ display().nameA }} plan to watch</span><strong>{{ display().planningA }}</strong></div>
-          <div class="o-row"><span>{{ display().nameB }} plan to watch</span><strong>{{ display().planningB }}</strong></div>
-          <div class="o-row total">
-            <span>In both backlogs</span
-            ><strong class="both">{{ display().bothPlanned }} ({{ display().overlapPct }}%)</strong>
+        <hk-module title="Backlog overlap" [pad]="true">
+          <div class="overlap">
+            <div class="o-row"><span>{{ d.nameA }} plan to watch</span><strong>{{ d.planningA }}</strong></div>
+            <div class="o-row"><span>{{ d.nameB }} plan to watch</span><strong>{{ d.planningB }}</strong></div>
+            <div class="o-row total">
+              <span>In both backlogs</span
+              ><strong class="both">{{ d.bothPlanned }} ({{ d.overlapPct }}%)</strong>
+            </div>
+            <div class="o-bar">
+              <div class="seg-both" [style.width.%]="segBoth()"></div>
+              <div class="seg-one" [style.width.%]="segOne()"></div>
+            </div>
+            <div class="o-note">Overlap counts titles present in both users' planning lists.</div>
           </div>
-          <div class="o-bar">
-            <div class="seg-both" [style.width.%]="segBoth()"></div>
-            <div class="seg-one" [style.width.%]="segOne()"></div>
-          </div>
-          <div class="o-note">Overlap counts titles present in both users' planning lists.</div>
-        </div>
-      </hk-module>
+        </hk-module>
+      </div>
     </div>
-  </div>
+  } @else if (!loading()) {
+    <div class="empty-state">
+      <h2 class="empty-title">See what you both plan to watch</h2>
+      <p class="empty-text">
+        Load two backlogs to find the titles in both plan-to-watch lists, ranked by predicted
+        mutual score — plus watch-together picks and what you're both currently watching.
+      </p>
+      <hk-button variant="secondary" size="sm" (click)="loadSample()">
+        Load a live sample ({{ samplePair.a }} × {{ samplePair.b }})
+      </hk-button>
+    </div>
+  }
 </div>

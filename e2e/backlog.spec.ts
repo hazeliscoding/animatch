@@ -35,10 +35,9 @@ test('loads real backlogs via query params', async ({ page }) => {
   await expect(page.locator('.medal-gold')).toHaveText('1');
 });
 
-test('tabs partition only-one and demo note is gone when live', async ({ page }) => {
+test('tabs partition only-one and watching-together when live', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/backlog?a=alice&b=bob');
-  await expect(page.getByText('Showing demo data')).toHaveCount(0);
 
   await page.getByRole('tab', { name: /Only in one backlog/ }).click();
   await expect(page.locator('.list-panel').getByRole('link', { name: 'Solo Plan' })).toBeVisible();
@@ -62,9 +61,9 @@ test('pair params carry from Compare to Shared backlog through the nav', async (
   await expect(page.locator('.list-panel').getByRole('link', { name: 'Monster Fixture' })).toBeVisible();
 });
 
-test('demo state renders without params', async ({ page }) => {
+test('empty state renders without params', async ({ page }) => {
   await page.goto('/backlog');
-  await expect(page.getByText('Showing demo data until you load two real users')).toBeVisible();
-  await expect(page.locator('.list-panel').getByRole('link', { name: 'Monster', exact: true })).toBeVisible();
-  await expect(page.locator('.subtitle')).toHaveText('yuki_47 × renko_lists');
+  await expect(page.getByRole('heading', { name: 'See what you both plan to watch' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Load a live sample/ })).toBeVisible();
+  await expect(page.locator('.list-panel')).toHaveCount(0);
 });

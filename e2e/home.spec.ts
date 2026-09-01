@@ -43,7 +43,7 @@ test('hero "try it live" link loads the sample pair', async ({ page }) => {
   await expect(page.locator('.demo-badge')).toHaveCount(0);
 });
 
-test('compare demo note offers a live sample link', async ({ page }) => {
+test('compare empty state offers a live sample link', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/compare');
   await page.getByRole('link', { name: /load a live sample/ }).click();
@@ -52,21 +52,14 @@ test('compare demo note offers a live sample link', async ({ page }) => {
 });
 
 test('genre profile toggles between bars and radar', async ({ page }) => {
-  await page.goto('/compare');
+  await mockAnilist(page);
+  await page.goto('/compare?a=alice&b=bob');
   await expect(page.locator('.genres')).toBeVisible();
   await page.getByRole('tab', { name: 'Radar' }).click();
   await expect(page.locator('hk-genre-radar svg')).toBeVisible();
   await expect(page.locator('polygon.series')).toHaveCount(2);
   await page.getByRole('tab', { name: 'Bars' }).click();
   await expect(page.locator('.genres')).toBeVisible();
-});
-
-test('demo link shows a clearly-labeled demo comparison', async ({ page }) => {
-  await page.goto('/');
-  await page.getByRole('link', { name: 'See a demo comparison →' }).click();
-  await expect(page).toHaveURL(/\/compare$/);
-  await expect(page.locator('.demo-badge').first()).toHaveText('DEMO');
-  await expect(page.getByText('Showing demo data')).toBeVisible();
 });
 
 test('brand wordmark navigates back home', async ({ page }) => {

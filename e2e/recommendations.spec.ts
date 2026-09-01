@@ -17,12 +17,12 @@ const mockAnilist = async (page: import('@playwright/test').Page) => {
   });
 };
 
-test('demo recommendations render with explainer rail', async ({ page }) => {
+test('empty state prompts for a pair', async ({ page }) => {
   await page.goto('/recommendations');
   await expect(page.getByRole('heading', { name: /Recommendations/ })).toBeVisible();
-  await expect(page.locator('.list-panel').getByRole('link', { name: 'Monster', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'How predictions work' })).toBeVisible();
-  await expect(page.getByText('Showing demo data')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Find something new for both of you' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Load a live sample/ })).toBeVisible();
+  await expect(page.locator('.list-panel')).toHaveCount(0);
 });
 
 test('live recommendations exclude owned titles and rank by fit', async ({ page }) => {
@@ -36,7 +36,6 @@ test('live recommendations exclude owned titles and rank by fit', async ({ page 
   await expect(list.getByRole('link', { name: 'Acclaimed Sleeper' })).toBeVisible();
   await expect(list.getByText('Loved site-wide · 91/100')).toBeVisible();
   await expect(page.locator('.subtitle')).toHaveText('alice × bob');
-  await expect(page.getByText('Showing demo data')).toHaveCount(0);
 });
 
 test('nav reaches recommendations and preserves the pair', async ({ page }) => {

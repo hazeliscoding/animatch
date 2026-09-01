@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_PAIR } from '../anilist.config';
 import { AnilistService } from '../api/anilist.service';
 import { PairStore } from '../api/pair-store';
-import { DEMO_RECOMMENDATIONS } from '../data/demo-recommendations';
 import { RecommendationView, buildRecommendations, fmtRec } from '../logic/recommendation-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
@@ -32,10 +31,9 @@ export class RecommendationsPage {
   readonly samplePair = SAMPLE_PAIR;
 
   readonly live = computed(() => this.recs() !== null);
-  readonly display = computed(() => this.recs() ?? DEMO_RECOMMENDATIONS);
   readonly subtitle = computed(() => {
     const p = this.pairNames();
-    return p ? `${p.a} × ${p.b}` : 'yuki_47 × renko_lists';
+    return p ? `${p.a} × ${p.b}` : '';
   });
 
   readonly crumbs = [

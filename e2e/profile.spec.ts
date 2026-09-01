@@ -25,14 +25,15 @@ const mockAnilist = async (page: import('@playwright/test').Page) => {
   });
 };
 
-test('logged out + unconfigured: no developer talk, lookup still works', async ({ page }) => {
+test('logged out: one-click connect, no developer talk, lookup works', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/profile');
   await expect(page.getByRole('heading', { name: 'My profile' })).toBeVisible();
 
-  // users never see a broken connect button; owner setup is tucked away
-  await expect(page.getByRole('button', { name: /Connect AniList/ })).toHaveCount(0);
-  await expect(page.getByText('Site owner: enable one-click AniList sign-in')).toBeVisible();
+  // the app ships with its client id — users get a plain connect button
+  await expect(page.getByRole('button', { name: /Connect AniList/ })).toBeVisible();
+  await expect(page.getByText('One click', { exact: false })).toBeVisible();
+  await expect(page.getByText('Site owner: enable one-click AniList sign-in')).toHaveCount(0);
 
   // any public profile can still be viewed
   await page.getByPlaceholder('AniList username').fill('alice');
@@ -41,15 +42,6 @@ test('logged out + unconfigured: no developer talk, lookup still works', async (
   await expect(page).toHaveURL(/profile\?u=alice/);
   await expect(page.getByText('3 completed')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Genre taste' })).toBeVisible();
-});
-
-test('configured deployment offers one-click connect', async ({ page }) => {
-  await mockAnilist(page);
-  await page.addInitScript(() => localStorage.setItem('animatch.clientId', '12345'));
-  await page.goto('/profile');
-  await expect(page.getByRole('button', { name: /Connect AniList/ })).toBeVisible();
-  await expect(page.getByText('One click', { exact: false })).toBeVisible();
-  await expect(page.getByText('Site owner: enable one-click AniList sign-in')).toHaveCount(0);
 });
 
 test('auth callback stores the token and profile shows the viewer', async ({ page }) => {

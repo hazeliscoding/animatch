@@ -58,7 +58,7 @@ test('dropdown closes on outside click and Escape clears it', async ({ page }) =
 
   await searchBox.fill('ali');
   await expect(page.locator('.search-results')).toBeVisible();
-  await page.locator('h2').first().click();
+  await page.getByRole('heading', { name: 'Pick two users to compare' }).click();
   await expect(page.locator('.search-results')).toHaveCount(0);
 
   await searchBox.fill('ali');

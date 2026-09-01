@@ -1,7 +1,10 @@
 <div class="page hk-stack">
   <hk-breadcrumbs [items]="crumbs" />
   <h1 class="title">
-    Recommendations <span class="subtitle">{{ subtitle() }}</span>
+    Recommendations
+    @if (subtitle()) {
+      <span class="subtitle">{{ subtitle() }}</span>
+    }
   </h1>
 
   @if (!live()) {
@@ -28,23 +31,37 @@
         </hk-button>
       </div>
       @if (error(); as err) {
-        <div class="picker-error">{{ err }}</div>
+        <div class="picker-error" role="alert">{{ err }}</div>
       } @else {
         <div class="picker-note">
-          Showing demo data —
-          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+          Any two public profiles work —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">or load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
         </div>
       }
     </div>
   }
 
+  @if (!live() && !loading()) {
+    <div class="empty-state">
+      <h2 class="empty-title">Find something new for both of you</h2>
+      <p class="empty-text">
+        Load two users and get AniList's most popular and highest-rated titles that neither of you
+        has listed, ranked by predicted mutual enjoyment with a reason per pick.
+      </p>
+      <hk-button variant="secondary" size="sm" (click)="loadSample()">
+        Load a live sample ({{ samplePair.a }} × {{ samplePair.b }})
+      </hk-button>
+    </div>
+  }
+
+  @if (recs(); as list) {
   <div class="layout">
     <div class="list-panel">
       <div class="list-head">
         <span class="count"><strong>Top picks</strong> neither of you has listed yet</span>
         <span class="src">from AniList's most popular and highest-rated anime</span>
       </div>
-      @for (r of display(); track r.title; let i = $index) {
+      @for (r of list; track r.title; let i = $index) {
         <div class="item">
           <span class="rank" [class.top]="i < 3">{{ i + 1 }}</span>
           <div class="poster">
@@ -93,4 +110,5 @@
       </hk-module>
     </div>
   </div>
+  }
 </div>

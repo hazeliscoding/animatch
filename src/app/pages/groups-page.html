@@ -2,7 +2,12 @@
   <hk-breadcrumbs [items]="crumbs" />
 
   <div class="title-row">
-    <h1 class="title">{{ groupName() }} <span class="subtitle">{{ memberCount() }} members</span></h1>
+    <h1 class="title">
+      Watch group
+      @if (memberCount() > 0) {
+        <span class="subtitle">{{ memberCount() }} members</span>
+      }
+    </h1>
   </div>
 
   <div class="picker">
@@ -19,6 +24,7 @@
           class="picker-input"
           [(ngModel)]="newMember"
           placeholder="AniList username"
+          aria-label="AniList username to add"
           [disabled]="loading()"
           (keyup.enter)="addMember()"
         />
@@ -29,54 +35,65 @@
       }
     </div>
     @if (error(); as err) {
-      <div class="picker-error">{{ err }}</div>
+      <div class="picker-error" role="alert">{{ err }}</div>
     } @else if (!live()) {
       <div class="picker-note">
-        Showing demo data — add 2–5 AniList usernames to build a real group, or
+        Add 2–5 AniList usernames to build a group, or
         <a href="#" (click)="$event.preventDefault(); loadSample()">load a sample group →</a>
       </div>
     }
   </div>
 
-  <hk-module title="Member stats">
-    <hk-comparison-table
-      [products]="display().users"
-      [attributes]="display().attrs"
-      [highlight]="display().highlight"
-    />
-  </hk-module>
-
-  <div class="grid">
-    <hk-module title="Pairwise taste match" [pad]="true">
-      <div class="matrix" [style.grid-template-columns]="'110px repeat(' + display().users.length + ', 1fr)'">
-        <div></div>
-        @for (u of display().users; track u) {
-          <div class="m-head">{{ u }}</div>
-        }
-        @for (c of display().matrixCells; track $index) {
-          <div class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</div>
-        }
-      </div>
-      <div class="matrix-note">
-        Match score combines score correlation and genre overlap on completed lists. 70+ = strong match.
-      </div>
+  @if (view(); as g) {
+    <hk-module title="Member stats">
+      <hk-comparison-table
+        [products]="g.users"
+        [attributes]="g.attrs"
+        [highlight]="g.highlight"
+      />
     </hk-module>
 
-    <hk-module title="Backlog shared by the group" [action]="'All ' + display().backlogTotal">
-      <div class="backlog-list">
-        @for (g of display().backlog; track g.title) {
-          <div class="row">
-            <span class="chip" [class]="'chip-' + g.chipKind">{{ g.chip }}</span>
-            <div class="main">
-              <a href="#" (click)="$event.preventDefault()" class="row-title">{{ g.title }}</a>
-              <div class="meta">{{ g.meta }}</div>
+    <div class="grid">
+      <hk-module title="Pairwise taste match" [pad]="true">
+        <div class="matrix" [style.grid-template-columns]="'110px repeat(' + g.users.length + ', 1fr)'">
+          <div></div>
+          @for (u of g.users; track u) {
+            <div class="m-head">{{ u }}</div>
+          }
+          @for (c of g.matrixCells; track $index) {
+            <div class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</div>
+          }
+        </div>
+        <div class="matrix-note">
+          Match score combines score correlation and genre overlap on completed lists. 70+ = strong match.
+        </div>
+      </hk-module>
+
+      <hk-module title="Backlog shared by the group" [action]="'All ' + g.backlogTotal">
+        <div class="backlog-list">
+          @for (b of g.backlog; track b.title) {
+            <div class="row">
+              <span class="chip" [class]="'chip-' + b.chipKind">{{ b.chip }}</span>
+              <div class="main">
+                <a href="#" (click)="$event.preventDefault()" class="row-title">{{ b.title }}</a>
+                <div class="meta">{{ b.meta }}</div>
+              </div>
+              <div class="who">{{ b.who }}</div>
             </div>
-            <div class="who">{{ g.who }}</div>
-          </div>
-        } @empty {
-          <div class="placeholder">No titles planned by two or more members yet.</div>
-        }
-      </div>
-    </hk-module>
-  </div>
+          } @empty {
+            <div class="placeholder">No titles planned by two or more members yet.</div>
+          }
+        </div>
+      </hk-module>
+    </div>
+  } @else if (!loading()) {
+    <div class="empty-state">
+      <h2 class="empty-title">Build a watch club</h2>
+      <p class="empty-text">
+        Add 2–5 members to see everyone's stats side by side, a pairwise taste-match matrix, and
+        the backlog your whole group shares.
+      </p>
+      <hk-button variant="secondary" size="sm" (click)="loadSample()">Load a sample group</hk-button>
+    </div>
+  }
 </div>

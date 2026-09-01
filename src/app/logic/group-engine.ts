@@ -2,8 +2,20 @@
 
 import { AnilistUserList } from '../api/anilist.service';
 import { ComparisonAttribute } from '../ui/comparison-table';
-import { GroupBacklogItem, MatrixCell } from '../data/animatch-data';
 import { completedOf, pairCompatScore } from './comparison-engine';
+
+export interface MatrixCell {
+  v: string;
+  kind: 'head' | 'self' | 'strong' | 'medium' | 'weak';
+}
+
+export interface GroupBacklogItem {
+  title: string;
+  meta: string;
+  chip: string;
+  chipKind: 'all' | 'most' | 'some';
+  who: string;
+}
 
 export interface GroupView {
   users: string[];

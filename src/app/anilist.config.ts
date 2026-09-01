@@ -11,7 +11,7 @@
  * against a second client, override it per-browser via
  * localStorage.setItem('animatch.clientId', '<dev id>').
  */
-export const ANILIST_CLIENT_ID = '';
+export const ANILIST_CLIENT_ID = '49943';
 
 /** Well-known public profiles used for "try it live" sample links. */
 export const SAMPLE_PAIR = { a: 'Anime', b: 'Kira' };

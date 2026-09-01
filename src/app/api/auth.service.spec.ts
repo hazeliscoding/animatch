@@ -37,13 +37,20 @@ describe('AuthService', () => {
     expect(localStorage.getItem('animatch.token')).toBeNull();
   });
 
-  it('is unconfigured without a client id and refuses login', () => {
+  it('ships configured with the app client id', () => {
     const auth = TestBed.inject(AuthService);
+    expect(auth.configured()).toBe(true);
+    expect(auth.authorizeUrl()).toContain('client_id=49943');
+    expect(auth.authorizeUrl()).toContain('response_type=token');
+  });
+
+  it('refuses login when the client id is cleared, and accepts overrides', () => {
+    const auth = TestBed.inject(AuthService);
+    auth.setClientId('');
     expect(auth.configured()).toBe(false);
     expect(auth.login()).toBe(false);
     auth.setClientId(' 4242 ');
     expect(auth.configured()).toBe(true);
     expect(auth.authorizeUrl()).toContain('client_id=4242');
-    expect(auth.authorizeUrl()).toContain('response_type=token');
   });
 });

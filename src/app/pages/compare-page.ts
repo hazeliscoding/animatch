@@ -2,10 +2,9 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SAMPLE_PAIR } from '../anilist.config';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HistoryStore } from '../api/history-store';
 import { PairStore } from '../api/pair-store';
-import { DEMO_COMPARISON } from '../data/demo-comparison';
 import { ComparisonView, buildComparison } from '../logic/comparison-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
@@ -15,7 +14,7 @@ import { HkModule } from '../ui/module';
 
 @Component({
   selector: 'app-compare-page',
-  imports: [FormsModule, HkBreadcrumbs, HkButton, HkDataTable, HkGenreRadar, HkModule],
+  imports: [FormsModule, RouterLink, HkBreadcrumbs, HkButton, HkDataTable, HkGenreRadar, HkModule],
   templateUrl: './compare-page.html',
   styleUrl: './compare-page.css',
 })
@@ -25,8 +24,7 @@ export class ComparePage {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly view = signal<ComparisonView>(DEMO_COMPARISON);
-  readonly live = signal(false);
+  readonly view = signal<ComparisonView | null>(null);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly editing = signal(false);
@@ -36,23 +34,19 @@ export class ComparePage {
   nameB = '';
   readonly samplePair = SAMPLE_PAIR;
 
-  loadSample() {
-    this.nameA = SAMPLE_PAIR.a;
-    this.nameB = SAMPLE_PAIR.b;
-    void this.compare();
-  }
+  readonly live = computed(() => this.view() !== null);
 
   readonly sharedCols = computed<TableColumn[]>(() => [
     { key: 'title', label: 'Title' },
-    { key: 'a', label: this.view().userA.name, align: 'right', sortable: true },
-    { key: 'b', label: this.view().userB.name, align: 'right', sortable: true },
+    { key: 'a', label: this.view()?.userA.name ?? 'User A', align: 'right', sortable: true },
+    { key: 'b', label: this.view()?.userB.name ?? 'User B', align: 'right', sortable: true },
     { key: 'd', label: 'Δ', align: 'right', sortable: true },
   ]);
 
   readonly crumbs = computed(() => [
     { label: 'Home', path: '/' },
     { label: 'Compare', path: '/compare' },
-    { label: `${this.view().userA.name} × ${this.view().userB.name}` },
+    ...(this.view() ? [{ label: `${this.view()!.userA.name} × ${this.view()!.userB.name}` }] : []),
   ]);
 
   constructor() {
@@ -64,8 +58,8 @@ export class ComparePage {
       if (a && b) {
         const alreadyLoaded =
           this.live() &&
-          this.view().userA.name.toLowerCase() === a.toLowerCase() &&
-          this.view().userB.name.toLowerCase() === b.toLowerCase();
+          this.view()!.userA.name.toLowerCase() === a.toLowerCase() &&
+          this.view()!.userB.name.toLowerCase() === b.toLowerCase();
         if (!alreadyLoaded) {
           this.nameA = a;
           this.nameB = b;
@@ -76,6 +70,12 @@ export class ComparePage {
         this.editing.set(true);
       }
     });
+  }
+
+  loadSample() {
+    this.nameA = SAMPLE_PAIR.a;
+    this.nameB = SAMPLE_PAIR.b;
+    void this.compare();
   }
 
   showPicker() {
@@ -95,8 +95,7 @@ export class ComparePage {
     try {
       const [listA, listB] = await this.pairStore.load(a, b);
       this.view.set(buildComparison(listA, listB));
-      this.history.recordComparison(listA.name, listB.name, this.view().compatScore);
-      this.live.set(true);
+      this.history.recordComparison(listA.name, listB.name, this.view()!.compatScore);
       this.editing.set(false);
       void this.router.navigate([], {
         relativeTo: this.route,

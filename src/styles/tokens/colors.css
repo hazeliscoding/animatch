@@ -21,4 +21,27 @@
 --color-new:var(--red-600);--color-sale:var(--red-600);--color-ranking:var(--orange-600);--color-ranking-gold:#8a6508;--color-ranking-silver:#6a707d;--color-ranking-bronze:#9a6a43;
 --color-focus:#0f57c2;--color-selection:var(--blue-100);
 --color-header:var(--gray-900);--color-nav-active:var(--blue-700);
+color-scheme:light;
+}
+
+/* Dark theme — stamped on <html> by the theme bootstrap/ThemeService.
+   The gray ramp inverts and the accent ramps re-step for the dark surface,
+   so component CSS needs no changes. Text pairs verified >= 4.5:1; chart
+   series (#5590e8 / #c97a28) validated against surface #1e2127. */
+:root[data-theme="dark"]{
+color-scheme:dark;
+--gray-0:#1e2127;--gray-50:#22252c;--gray-100:#16181d;--gray-150:#2b3039;--gray-200:#333842;--gray-300:#3d434f;--gray-400:#4d5464;--gray-500:#8b93a1;--gray-600:#aab1bd;--gray-700:#c6ccd6;--gray-800:#dde1e7;--gray-900:#e9ebef;
+--blue-50:#1c2b47;--blue-100:#24365c;--blue-600:#5590e8;--blue-700:#8fb6f3;--blue-800:#b3cdf7;
+--red-50:#3a2224;--red-600:#e8837b;--red-700:#f19b94;
+--orange-50:#3a2b1a;--orange-600:#c97a28;--orange-700:#f0a763;
+--green-50:#1e3326;--green-600:#57c47b;--green-700:#7bd394;
+--yellow-50:#3a3418;--yellow-500:#d9c14f;--yellow-800:#e5d06b;
+--purple-600:#b48ce0;
+--color-text-muted:#98a0ad;
+--color-link:#79a8f2;--color-link-hover:#9dbff6;--color-link-visited:var(--purple-600);
+--color-primary:#2a63c4;--color-primary-hover:#3672d4;--color-primary-active:#1f56b8;--color-primary-subtle:var(--blue-50);
+--color-focus:#79a8f2;--color-selection:#2a3f66;
+--shadow-raised:0 1px 2px rgba(0,0,0,.4);
+--shadow-overlay:0 2px 8px rgba(0,0,0,.5);
+--shadow-modal:0 4px 20px rgba(0,0,0,.6);
 }

@@ -41,6 +41,12 @@
         AniMatch
       </a>
       <span class="m-tagline">for AniList</span>
+      <button
+        type="button"
+        class="m-theme"
+        [attr.aria-label]="themeService.theme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+        (click)="themeService.toggle()"
+      >{{ themeService.theme() === 'dark' ? '☀' : '☾' }}</button>
       @if (auth.connected()) {
         <a routerLink="/profile" class="m-signin">{{ viewer()?.name ?? 'Profile' }}</a>
       } @else {

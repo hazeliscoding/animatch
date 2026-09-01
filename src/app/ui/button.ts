@@ -43,7 +43,8 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     .s-lg { height: var(--control-height-lg); font-size: var(--text-base); }
     .v-primary { background: var(--color-primary); color: #fff; border: 1px solid var(--color-primary); }
     .v-primary:hover:not(:disabled) { filter: brightness(0.92); }
-    .v-secondary { background: var(--color-surface); color: var(--color-primary); border: 1px solid var(--color-primary); }
+    /* --color-link equals --color-primary in light and stays readable in dark */
+    .v-secondary { background: var(--color-surface); color: var(--color-link); border: 1px solid var(--color-link); }
     .v-neutral { background: var(--color-surface); color: var(--color-text); border: 1px solid var(--color-border-strong); }
     .v-danger { background: var(--color-danger); color: #fff; border: 1px solid var(--color-danger); }
     .v-danger:hover:not(:disabled) { filter: brightness(0.92); }

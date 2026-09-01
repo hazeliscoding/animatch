@@ -6,8 +6,21 @@
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Compare two AniList profiles — scores, genres, and backlogs — to see how compatible your anime taste is and what to watch together. Free, no account needed.">
-  <meta name="theme-color" content="#0f57c2">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0f57c2">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#16181d">
   <link rel="canonical" href="https://animatch-moe.vercel.app/">
+  <script>
+    // Stamp the theme before first paint to avoid a light flash.
+    (function () {
+      try {
+        var t = localStorage.getItem('animatch.theme');
+        if (t !== 'dark' && t !== 'light') {
+          t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = t;
+      } catch (e) { /* default to light */ }
+    })();
+  </script>
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AniMatch">

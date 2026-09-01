@@ -18,6 +18,7 @@ Compare anime taste between [AniList](https://anilist.co) users. One place that 
 - 👥 **Groups** — member stats, a pairwise taste-match heat matrix, and the backlog shared by the whole group.
 - 📱 **Mobile layout** — compact summary view with bottom navigation under 720px.
 - 🪪 **Profiles & sign-in** — view any public profile's stats (score distribution, genre taste, top studios), or connect your own AniList account via OAuth. Recent comparisons and groups persist locally.
+- 🌙 **Dark mode** — follows your OS by default, with a sun/moon toggle; the full token set is contrast-validated in both themes.
 
 | Shared backlog | Groups |
 | --- | --- |

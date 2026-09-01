@@ -5,6 +5,7 @@ import { filter, map } from 'rxjs';
 import { AnilistService, AnilistUserHit } from './api/anilist.service';
 import { AuthService } from './api/auth.service';
 import { SeoService } from './seo.service';
+import { ThemeService } from './theme.service';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
 import { HkSearchInput } from './ui/search-input';
@@ -22,20 +23,29 @@ export class App {
   private readonly router = inject(Router);
   private readonly anilist = inject(AnilistService);
   readonly auth = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   readonly utilLeft = UTIL_LEFT;
   readonly navItems = NAV_ITEMS;
 
   readonly viewer = this.auth.viewer;
 
-  readonly utilRight = computed<UtilityItem[]>(() =>
-    this.auth.connected()
+  readonly themeLabel = computed(() =>
+    this.themeService.theme() === 'dark' ? '☀ Light mode' : '☾ Dark mode',
+  );
+
+  readonly utilRight = computed<UtilityItem[]>(() => [
+    { label: this.themeLabel(), action: 'theme' },
+    ...(this.auth.connected()
       ? [
-          { label: this.viewer() ? `Signed in as ${this.viewer()!.name}` : 'My profile', action: 'profile' },
+          {
+            label: this.viewer() ? `Signed in as ${this.viewer()!.name}` : 'My profile',
+            action: 'profile',
+          },
           { label: 'Log out', action: 'logout' },
         ]
-      : [{ label: 'Connect AniList', action: 'connect' }],
-  );
+      : [{ label: 'Connect AniList', action: 'connect' }]),
+  ]);
 
   readonly searchResults = signal<AnilistUserHit[]>([]);
   readonly searchOpen = signal(false);
@@ -84,7 +94,9 @@ export class App {
   }
 
   onUtilAction(action: string) {
-    if (action === 'connect') {
+    if (action === 'theme') {
+      this.themeService.toggle();
+    } else if (action === 'connect') {
       if (!this.auth.login()) void this.router.navigate(['/profile']);
     } else if (action === 'profile') {
       void this.router.navigate(['/profile']);

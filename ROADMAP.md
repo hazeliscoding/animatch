@@ -21,6 +21,7 @@
 - [ ] Session planner for shared backlogs (episode pacing, sync-up suggestions)
 
 ## Phase 4 — Polish & delivery
+- [x] Dark mode (system default + sun/moon toggle, contrast-validated dark token set)
 - [x] Mobile layouts for Shared backlog, Groups, and Recommendations (stacked rows, mobile search, full bottom nav)
 - [ ] Density switcher (compact / standard / comfortable — tokens already support it)
 - [x] E2E smoke tests (Playwright)

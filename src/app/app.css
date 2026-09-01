@@ -101,7 +101,19 @@
   flex: none;
 }
 .m-tagline { font-size: 11px; color: var(--color-text-muted); }
-.m-signin { margin-left: auto; font-size: 13px; text-decoration: none; }
+.m-theme {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 17px;
+  line-height: 1;
+  padding: 10px;
+  margin-top: -8px;
+  margin-bottom: -8px;
+  cursor: pointer;
+}
+.m-signin { font-size: 13px; text-decoration: none; }
 
 .mobile-nav {
   position: sticky;

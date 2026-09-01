@@ -56,7 +56,12 @@
         }
       </div>
       <div>
-        <div class="user-name">{{ view().userA.name }}</div>
+        <div class="user-name">
+          {{ view().userA.name }}
+          @if (!live()) {
+            <span class="demo-badge">DEMO</span>
+          }
+        </div>
         <div class="user-meta">{{ view().userA.completed }} completed · mean {{ view().userA.mean }}</div>
       </div>
     </div>
@@ -94,7 +99,12 @@
           {{ view().userA.initial }}
         }
       </div>
-      <div class="names">{{ view().userA.name }} <span class="x">×</span> {{ view().userB.name }}</div>
+      <div class="names">
+        {{ view().userA.name }} <span class="x">×</span> {{ view().userB.name }}
+        @if (!live()) {
+          <span class="demo-badge">DEMO</span>
+        }
+      </div>
       <div class="avatar sm b right">
         @if (view().userB.avatar; as av) {
           <img [src]="av" alt="" />

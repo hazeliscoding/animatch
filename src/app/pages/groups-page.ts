@@ -40,7 +40,7 @@ export class GroupsPage {
   readonly canAdd = computed(() => this.members().length < MAX_MEMBERS);
 
   readonly crumbs = [
-    { label: 'Home', path: '/compare' },
+    { label: 'Home', path: '/' },
     { label: 'Groups', path: '/groups' },
     { label: 'Watch group' },
   ];

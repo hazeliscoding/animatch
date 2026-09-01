@@ -1,0 +1,75 @@
+<div class="page">
+  <section class="hero">
+    <h1 class="hero-title">Do you actually have the same taste in anime?</h1>
+    <p class="hero-sub">
+      AniMatch compares two <a href="https://anilist.co" target="_blank" rel="noopener">AniList</a> profiles —
+      scores, genres, and backlogs — and tells you how compatible you are and what to watch together.
+    </p>
+
+    <form class="hero-form" (submit)="$event.preventDefault(); compare()">
+      <input
+        class="hero-input"
+        [(ngModel)]="nameA"
+        name="a"
+        [placeholder]="auth.viewer() ? auth.viewer()!.name : 'your AniList username'"
+        aria-label="First AniList username"
+      />
+      <span class="hero-x">×</span>
+      <input
+        class="hero-input"
+        [(ngModel)]="nameB"
+        name="b"
+        placeholder="a friend's username"
+        aria-label="Second AniList username"
+      />
+      <button type="submit" class="hero-go">Compare</button>
+    </form>
+
+    <div class="hero-links">
+      <a routerLink="/compare">See a demo comparison →</a>
+      @if (!auth.connected()) {
+        <span class="dot">·</span>
+        <a routerLink="/profile">Connect your AniList account →</a>
+      }
+    </div>
+
+    @if (history.comparisons().length) {
+      <div class="hero-recent">
+        <span class="recent-label">Pick up where you left off:</span>
+        @for (c of history.comparisons().slice(0, 3); track c.a + c.b) {
+          <a class="recent-chip" routerLink="/compare" [queryParams]="{ a: c.a, b: c.b }">
+            {{ c.a }} × {{ c.b }} <span class="chip-score">{{ c.score }}</span>
+          </a>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="steps">
+    @for (s of steps; track s.n) {
+      <div class="step">
+        <span class="step-n">{{ s.n }}</span>
+        <div>
+          <div class="step-title">{{ s.title }}</div>
+          <div class="step-text">{{ s.text }}</div>
+        </div>
+      </div>
+    }
+  </section>
+
+  <section class="features">
+    @for (f of features; track f.title) {
+      <div class="feature">
+        <div class="feature-head">{{ f.title }}</div>
+        <div class="feature-body">
+          <p class="feature-text">{{ f.text }}</p>
+          <a [routerLink]="f.link" class="feature-cta">{{ f.cta }} →</a>
+        </div>
+      </div>
+    }
+  </section>
+
+  <p class="foot-note">
+    Works with public AniList data — no account needed. Every page shows labeled demo data until you load real users.
+  </p>
+</div>

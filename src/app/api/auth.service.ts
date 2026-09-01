@@ -1,5 +1,11 @@
 import { Injectable, computed, signal } from '@angular/core';
 
+export interface ViewerIdentity {
+  id: number;
+  name: string;
+  avatar: string | null;
+}
+
 /**
  * AniList OAuth, implicit grant — the right fit for a backend-less SPA.
  * Register a client at https://anilist.co/settings/developer with this app's
@@ -17,6 +23,8 @@ const CLIENT_ID_KEY = 'animatch.clientId';
 export class AuthService {
   readonly token = signal<string | null>(this.readStoredToken());
   readonly connected = computed(() => this.token() !== null);
+  /** Populated by the app shell once the token is verified against AniList. */
+  readonly viewer = signal<ViewerIdentity | null>(null);
 
   readonly clientId = signal<string>(localStorage.getItem(CLIENT_ID_KEY) || DEFAULT_CLIENT_ID);
   readonly configured = computed(() => this.clientId().trim().length > 0);
@@ -74,5 +82,6 @@ export class AuthService {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EXPIRY_KEY);
     this.token.set(null);
+    this.viewer.set(null);
   }
 }

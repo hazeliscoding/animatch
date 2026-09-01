@@ -6,7 +6,7 @@ test('demo comparison renders until real users are compared', async ({ page }) =
   await page.goto('/compare');
   await expect(page.getByText('Showing demo data')).toBeVisible();
   await expect(page.locator('.score')).toHaveText(/78\s*\/100/);
-  await expect(page.locator('.user-name').first()).toHaveText('yuki_47');
+  await expect(page.locator('.user-name').first()).toHaveText(/yuki_47/);
   await expect(page.getByRole('heading', { name: 'Compatibility breakdown' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Genre taste profile' })).toBeVisible();
 });
@@ -54,5 +54,5 @@ test('unknown user surfaces a friendly error and keeps demo data', async ({ page
   await page.getByPlaceholder('second username').fill('also-nobody');
   await page.getByRole('button', { name: 'Compare', exact: true }).click();
   await expect(page.locator('.picker-error')).toContainText('not found');
-  await expect(page.locator('.user-name').first()).toHaveText('yuki_47');
+  await expect(page.locator('.user-name').first()).toHaveText(/yuki_47/);
 });

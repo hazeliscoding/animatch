@@ -1,11 +1,13 @@
 import { Component, input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'hk-global-header',
+  imports: [RouterLink],
   template: `
     <header class="header">
       <div class="inner">
-        <a href="#" class="brand hk-link-quiet" (click)="$event.preventDefault()">
+        <a routerLink="/" class="brand hk-link-quiet">
           <span class="wordmark">{{ brand() }}</span>
           @if (tagline(); as t) {
             <span class="tagline">{{ t }}</span>

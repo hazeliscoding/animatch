@@ -1,0 +1,55 @@
+import { expect, test } from '@playwright/test';
+import { FIXTURES } from './fixtures';
+
+const mockAnilist = async (page: import('@playwright/test').Page) => {
+  await page.route('https://graphql.anilist.co/**', async (route) => {
+    const body = route.request().postDataJSON() as { query: string; variables?: { name?: string } };
+    const fixture = FIXTURES[body.variables?.name ?? ''];
+    if (!fixture) {
+      await route.fulfill({ status: 404, json: { errors: [{ message: 'User not found' }] } });
+      return;
+    }
+    await route.fulfill({ json: fixture });
+  });
+};
+
+test('landing page explains the app and offers entry points', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: /same taste in anime/ })).toBeVisible();
+  await expect(page.getByLabel('First AniList username')).toBeVisible();
+  await expect(page.getByText('Pick two AniList users')).toBeVisible();
+  await expect(page.getByText('See your taste match')).toBeVisible();
+  await expect(page.getByText('Find what to watch together')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Open Compare →' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Open Groups →' })).toBeVisible();
+});
+
+test('hero form starts a comparison', async ({ page }) => {
+  await mockAnilist(page);
+  await page.goto('/');
+  await page.getByLabel('First AniList username').fill('alice');
+  await page.getByLabel('Second AniList username').fill('bob');
+  await page.getByRole('button', { name: 'Compare' }).click();
+  await expect(page).toHaveURL(/compare\?a=alice&b=bob/);
+  await expect(page.locator('.user-name').first()).toHaveText(/alice/);
+});
+
+test('demo link shows a clearly-labeled demo comparison', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'See a demo comparison →' }).click();
+  await expect(page).toHaveURL(/\/compare$/);
+  await expect(page.locator('.demo-badge').first()).toHaveText('DEMO');
+  await expect(page.getByText('Showing demo data')).toBeVisible();
+});
+
+test('brand wordmark navigates back home', async ({ page }) => {
+  await page.goto('/groups');
+  await page.getByRole('link', { name: 'AniMatch for AniList' }).click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { name: /same taste in anime/ })).toBeVisible();
+});
+
+test('unknown routes land on the home page', async ({ page }) => {
+  await page.goto('/definitely-not-a-page');
+  await expect(page.getByRole('heading', { name: /same taste in anime/ })).toBeVisible();
+});

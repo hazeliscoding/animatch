@@ -37,7 +37,7 @@ export class ProfilePage {
   );
 
   readonly crumbs = computed(() => [
-    { label: 'Home', path: '/compare' },
+    { label: 'Home', path: '/' },
     { label: 'My profile' },
     ...(this.profile() ? [{ label: this.profile()!.name }] : []),
   ]);

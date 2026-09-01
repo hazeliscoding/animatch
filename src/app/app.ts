@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
-import { AnilistService, AnilistUserHit, AnilistViewer } from './api/anilist.service';
+import { AnilistService, AnilistUserHit } from './api/anilist.service';
 import { AuthService } from './api/auth.service';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
@@ -25,7 +25,7 @@ export class App {
   readonly utilLeft = UTIL_LEFT;
   readonly navItems = NAV_ITEMS;
 
-  readonly viewer = signal<AnilistViewer | null>(null);
+  readonly viewer = this.auth.viewer;
 
   readonly utilRight = computed<UtilityItem[]>(() =>
     this.auth.connected()
@@ -51,10 +51,11 @@ export class App {
 
   readonly activeNav = computed(() => {
     const url = this.url();
+    if (url.startsWith('/compare')) return 'Compare';
     if (url.startsWith('/backlog')) return 'Shared backlog';
     if (url.startsWith('/groups')) return 'Groups';
     if (url.startsWith('/profile')) return 'My profile';
-    return 'Compare';
+    return '';
   });
 
   readonly mobileNav = [
@@ -68,12 +69,12 @@ export class App {
     effect(() => {
       const token = this.auth.token();
       if (!token) {
-        this.viewer.set(null);
+        this.auth.viewer.set(null);
         return;
       }
       void this.anilist
         .getViewer(token)
-        .then((v) => this.viewer.set(v))
+        .then((v) => this.auth.viewer.set(v))
         .catch(() => this.auth.logout());
     });
   }

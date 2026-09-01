@@ -63,7 +63,7 @@ export class BacklogPage {
   });
 
   readonly crumbs = [
-    { label: 'Home', path: '/compare' },
+    { label: 'Home', path: '/' },
     { label: 'Compare', path: '/compare' },
     { label: 'Shared backlog' },
   ];

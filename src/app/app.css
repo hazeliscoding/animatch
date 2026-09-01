@@ -56,7 +56,7 @@
   align-items: center;
   gap: 10px;
 }
-.m-brand { font-size: 17px; font-weight: 700; color: var(--color-text); }
+.m-brand, .m-brand:visited { font-size: 17px; font-weight: 700; color: var(--color-text); text-decoration: none; }
 .m-tagline { font-size: 11px; color: var(--color-text-muted); }
 .m-signin { margin-left: auto; font-size: 13px; text-decoration: none; }
 

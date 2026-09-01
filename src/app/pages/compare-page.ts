@@ -40,7 +40,7 @@ export class ComparePage {
   ]);
 
   readonly crumbs = computed(() => [
-    { label: 'Home', path: '/compare' },
+    { label: 'Home', path: '/' },
     { label: 'Compare', path: '/compare' },
     { label: `${this.view().userA.name} × ${this.view().userB.name}` },
   ]);

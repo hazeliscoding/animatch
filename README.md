@@ -2,6 +2,8 @@
 
 <h1 align="center">AniMatch</h1>
 
+<p align="center"><strong><a href="https://animatch-moe.vercel.app">animatch-moe.vercel.app</a></strong></p>
+
 Compare anime taste between [AniList](https://anilist.co) users. One place that answers: **how compatible are we, where do we disagree, and what should we watch together?**
 
 ![Compare — head-to-head](docs/screenshots/compare.png)

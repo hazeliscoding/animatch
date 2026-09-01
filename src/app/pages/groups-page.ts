@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SAMPLE_GROUP } from '../anilist.config';
 import { AnilistService } from '../api/anilist.service';
 import { HistoryStore } from '../api/history-store';
 import { DEMO_GROUP } from '../data/demo-group';
@@ -56,6 +57,11 @@ export class GroupsPage {
       this.members.set(names);
       if (names.length >= 2) void this.load();
     }
+  }
+
+  loadSample() {
+    this.members.set([...SAMPLE_GROUP]);
+    void this.load();
   }
 
   addMember() {

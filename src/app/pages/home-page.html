@@ -26,6 +26,10 @@
     </form>
 
     <div class="hero-links">
+      <a routerLink="/compare" [queryParams]="{ a: samplePair.a, b: samplePair.b }"
+        >Try it live: {{ samplePair.a }} × {{ samplePair.b }} →</a
+      >
+      <span class="dot">·</span>
       <a routerLink="/compare">See a demo comparison →</a>
       @if (!auth.connected()) {
         <span class="dot">·</span>

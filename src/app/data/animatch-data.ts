@@ -23,7 +23,7 @@ export const NAV_ITEMS = [
   { label: 'Compare', path: '/compare' },
   { label: 'Shared backlog', path: '/backlog' },
   { label: 'Groups', path: '/groups' },
-  { label: 'Recommendations' },
+  { label: 'Recommendations', path: '/recommendations' },
   { label: 'My profile', path: '/profile' },
 ];
 

@@ -1,0 +1,96 @@
+<div class="page hk-stack">
+  <hk-breadcrumbs [items]="crumbs" />
+  <h1 class="title">
+    Recommendations <span class="subtitle">{{ subtitle() }}</span>
+  </h1>
+
+  @if (!live()) {
+    <div class="picker">
+      <div class="picker-row">
+        <span class="picker-label">Recommend for two AniList users</span>
+        <input
+          class="picker-input"
+          [(ngModel)]="nameA"
+          placeholder="first username"
+          [disabled]="loading()"
+          (keyup.enter)="load()"
+        />
+        <span class="vs">×</span>
+        <input
+          class="picker-input"
+          [(ngModel)]="nameB"
+          placeholder="second username"
+          [disabled]="loading()"
+          (keyup.enter)="load()"
+        />
+        <hk-button variant="primary" size="sm" [disabled]="loading()" (click)="load()">
+          {{ loading() ? 'Crunching lists…' : 'Recommend' }}
+        </hk-button>
+      </div>
+      @if (error(); as err) {
+        <div class="picker-error">{{ err }}</div>
+      } @else {
+        <div class="picker-note">
+          Showing demo data —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="layout">
+    <div class="list-panel">
+      <div class="list-head">
+        <span class="count"><strong>Top picks</strong> neither of you has listed yet</span>
+        <span class="src">from AniList's most popular and highest-rated anime</span>
+      </div>
+      @for (r of display(); track r.title; let i = $index) {
+        <div class="item">
+          <span class="rank" [class.top]="i < 3">{{ i + 1 }}</span>
+          <div class="poster">
+            @if (r.cover) {
+              <img [src]="r.cover" alt="" />
+            } @else {
+              IMG
+            }
+          </div>
+          <div class="main">
+            <a href="#" (click)="$event.preventDefault()" class="item-title">{{ r.title }}</a>
+            <div class="meta">{{ r.meta }} · {{ r.genres }}</div>
+            <div class="note">{{ r.reason }}</div>
+          </div>
+          <div class="scores">
+            <div class="predicted">
+              <div class="predicted-label">Predicted mutual</div>
+              <div class="predicted-score">★ {{ fmt(r.predicted) }}</div>
+            </div>
+            @if (r.avg != null) {
+              <div class="avg">site {{ r.avg }}/100</div>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="placeholder">Nothing left to recommend — you two have seen everything.</div>
+      }
+    </div>
+
+    <div class="rail hk-stack">
+      <hk-module title="How predictions work" accent="tint" [pad]="true">
+        <div class="how">
+          <p>
+            Each pick starts from AniList's site-wide average, then shifts up or down by how both of
+            you historically score its genres relative to your own means.
+          </p>
+          <p>
+            Anything either of you has completed, planned, started, paused, or dropped is excluded —
+            these are genuinely new to both.
+          </p>
+          <p class="muted">
+            Candidates come from AniList's top ~100 most popular and highest-rated anime. Deeper
+            catalog digging is on the roadmap.
+          </p>
+        </div>
+      </hk-module>
+    </div>
+  </div>
+</div>

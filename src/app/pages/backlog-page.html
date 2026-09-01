@@ -30,7 +30,10 @@
       @if (error(); as err) {
         <div class="picker-error">{{ err }}</div>
       } @else {
-        <div class="picker-note">Showing demo data until you load two real users.</div>
+        <div class="picker-note">
+          Showing demo data until you load two real users —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+        </div>
       }
     </div>
   }

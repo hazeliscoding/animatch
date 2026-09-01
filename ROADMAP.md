@@ -14,8 +14,8 @@
 - [x] Persist recent comparisons and groups (localStorage — backend sync later)
 
 ## Phase 3 — Depth
-- [ ] Recommendations page (predicted mutual scores across the full catalog)
-- [ ] Radar-style genre spread on the compare page
+- [x] Recommendations page (predicted mutual scores over AniList's top ~100 popular/highest-rated; deeper catalog digging later)
+- [x] Radar-style genre spread on the compare page (bars ⇄ radar toggle)
 - [x] Backlog tabs: "Only in one backlog" and "Watching together" populated
 - [ ] Group management: create groups, add/remove members
 - [ ] Session planner for shared backlogs (episode pacing, sync-up suggestions)
@@ -25,4 +25,4 @@
 - [ ] Density switcher (compact / standard / comfortable — tokens already support it)
 - [x] E2E smoke tests (Playwright)
 - [x] CI (GitHub Actions: build + unit + e2e)
-- [ ] Deploy to Vercel (`vercel.json` is ready — import the GitHub repo at vercel.com/new)
+- [x] Deploy to Vercel

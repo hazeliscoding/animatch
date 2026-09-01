@@ -72,12 +72,18 @@ function metaOf(e: AnimeEntry): string {
   return parts.join(' · ');
 }
 
-interface GenreStats {
+export interface GenreStats {
   mean: number;
   byGenre: Map<string, { sum: number; n: number }>;
 }
 
-function genreStatsOf(completed: AnimeEntry[]): GenreStats {
+/** The slice of a media object the prediction math needs. */
+export interface PredictableTitle {
+  genres: string[];
+  averageScore: number | null;
+}
+
+export function genreStatsOf(completed: AnimeEntry[]): GenreStats {
   const scored = completed.filter((e) => e.score != null);
   const mean = scored.length ? scored.reduce((s, e) => s + e.score!, 0) / scored.length : 0;
   const byGenre = new Map<string, { sum: number; n: number }>();
@@ -93,7 +99,7 @@ function genreStatsOf(completed: AnimeEntry[]): GenreStats {
 }
 
 /** How far above/below their own mean this user scores the title's genres, clamped to ±1. */
-export function genreFit(stats: GenreStats, title: AnimeEntry): number {
+export function genreFit(stats: GenreStats, title: PredictableTitle): number {
   if (stats.mean === 0) return 0;
   let sum = 0;
   let n = 0;
@@ -109,13 +115,13 @@ export function genreFit(stats: GenreStats, title: AnimeEntry): number {
 }
 
 /** Predicted mutual enjoyment on a 1–10 scale. */
-export function predictedScore(a: GenreStats, b: GenreStats, title: AnimeEntry): number {
+export function predictedScore(a: GenreStats, b: GenreStats, title: PredictableTitle): number {
   const base = title.averageScore != null ? title.averageScore / 10 : 7;
   const adj = (genreFit(a, title) + genreFit(b, title)) / 2;
   return Math.max(1, Math.min(10, base + adj));
 }
 
-function bestGenre(a: GenreStats, b: GenreStats, title: AnimeEntry): string | null {
+export function bestGenre(a: GenreStats, b: GenreStats, title: PredictableTitle): string | null {
   let best: string | null = null;
   let bestFit = 0.3; // only call out genuinely-liked genres
   for (const g of title.genres) {

@@ -45,6 +45,18 @@ export interface AnilistViewer {
   avatar: string | null;
 }
 
+export interface CandidateMedia {
+  id: number;
+  title: string;
+  format: string | null;
+  year: number | null;
+  episodes: number | null;
+  genres: string[];
+  cover: string | null;
+  averageScore: number | null;
+  popularity: number;
+}
+
 const USER_LISTS_QUERY = `
 query ($name: String) {
   MediaListCollection(userName: $name, type: ANIME, forceSingleCompletedList: true) {
@@ -70,6 +82,27 @@ query ($name: String) {
       }
     }
   }
+}`;
+
+const TOP_MEDIA_QUERY = `
+query {
+  popular: Page(perPage: 50) {
+    media(type: ANIME, sort: POPULARITY_DESC) { ...m }
+  }
+  top: Page(perPage: 50) {
+    media(type: ANIME, sort: SCORE_DESC, popularity_greater: 20000) { ...m }
+  }
+}
+fragment m on Media {
+  id
+  title { userPreferred }
+  format
+  seasonYear
+  episodes
+  genres
+  popularity
+  averageScore
+  coverImage { medium }
 }`;
 
 const VIEWER_QUERY = `
@@ -189,6 +222,29 @@ export class AnilistService {
       avatar: collection.user.avatar?.medium ?? null,
       entries: [...byMediaId.values()],
     };
+  }
+
+  /** Popular + top-rated anime as recommendation candidates (deduped). */
+  async getTopMedia(): Promise<CandidateMedia[]> {
+    const res = await this.gql<{
+      data: { popular: { media: GqlMedia[] } | null; top: { media: GqlMedia[] } | null } | null;
+    }>(TOP_MEDIA_QUERY, {}, 'catalog');
+    const byId = new Map<number, CandidateMedia>();
+    for (const m of [...(res.data?.popular?.media ?? []), ...(res.data?.top?.media ?? [])]) {
+      if (byId.has(m.id)) continue;
+      byId.set(m.id, {
+        id: m.id,
+        title: m.title.userPreferred,
+        format: m.format,
+        year: m.seasonYear,
+        episodes: m.episodes,
+        genres: m.genres ?? [],
+        cover: m.coverImage?.medium ?? null,
+        averageScore: m.averageScore,
+        popularity: m.popularity ?? 0,
+      });
+    }
+    return [...byId.values()];
   }
 
   /** Who does this OAuth token belong to? */

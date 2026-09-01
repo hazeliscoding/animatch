@@ -54,6 +54,7 @@ export class App {
     if (url.startsWith('/compare')) return 'Compare';
     if (url.startsWith('/backlog')) return 'Shared backlog';
     if (url.startsWith('/groups')) return 'Groups';
+    if (url.startsWith('/recommendations')) return 'Recommendations';
     if (url.startsWith('/profile')) return 'My profile';
     return '';
   });

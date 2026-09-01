@@ -28,7 +28,10 @@
       @if (error(); as err) {
         <div class="picker-error">{{ err }}</div>
       } @else if (!live()) {
-        <div class="picker-note">Showing demo data until you compare two real users.</div>
+        <div class="picker-note">
+          Showing demo data until you compare two real users —
+          <a href="#" (click)="$event.preventDefault(); loadSample()">load a live sample ({{ samplePair.a }} × {{ samplePair.b }}) →</a>
+        </div>
       }
       @if (!live() && history.comparisons().length) {
         <div class="picker-recent">
@@ -232,19 +235,42 @@
           <span class="key"><span class="swatch a"></span>{{ view().userA.name }}</span>
           <span class="key"><span class="swatch b"></span>{{ view().userB.name }}</span>
           <span class="legend-note">% of each user's completed list</span>
+          <span class="view-toggle" role="tablist" aria-label="Genre profile view">
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="genreView() === 'bars'"
+              class="vt"
+              [class.sel]="genreView() === 'bars'"
+              (click)="genreView.set('bars')"
+            >Bars</button>
+            <span class="vt-sep">|</span>
+            <button
+              type="button"
+              role="tab"
+              [attr.aria-selected]="genreView() === 'radar'"
+              class="vt"
+              [class.sel]="genreView() === 'radar'"
+              (click)="genreView.set('radar')"
+            >Radar</button>
+          </span>
         </div>
-        <div class="genres">
-          @for (g of view().genres; track g.name) {
-            <div class="g-row">
-              <div class="g-name">{{ g.name }}</div>
-              <div class="g-bars">
-                <div class="meter flat"><div class="fill a" [style.width.%]="g.aPct"></div></div>
-                <div class="meter flat"><div class="fill b" [style.width.%]="g.bPct"></div></div>
+        @if (genreView() === 'bars') {
+          <div class="genres">
+            @for (g of view().genres; track g.name) {
+              <div class="g-row">
+                <div class="g-name">{{ g.name }}</div>
+                <div class="g-bars">
+                  <div class="meter flat"><div class="fill a" [style.width.%]="g.aPct"></div></div>
+                  <div class="meter flat"><div class="fill b" [style.width.%]="g.bPct"></div></div>
+                </div>
+                <div class="g-pcts">{{ g.pcts }}</div>
               </div>
-              <div class="g-pcts">{{ g.pcts }}</div>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        } @else {
+          <hk-genre-radar [genres]="view().genres" [nameA]="view().userA.name" [nameB]="view().userB.name" />
+        }
       </hk-module>
     </div>
   </div>

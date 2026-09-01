@@ -64,7 +64,7 @@ test('pair params carry from Compare to Shared backlog through the nav', async (
 
 test('demo state renders without params', async ({ page }) => {
   await page.goto('/backlog');
-  await expect(page.getByText('Showing demo data until you load two real users.')).toBeVisible();
+  await expect(page.getByText('Showing demo data until you load two real users')).toBeVisible();
   await expect(page.locator('.list-panel').getByRole('link', { name: 'Monster', exact: true })).toBeVisible();
   await expect(page.locator('.subtitle')).toHaveText('yuki_47 × renko_lists');
 });

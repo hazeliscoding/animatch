@@ -4,36 +4,56 @@
   @if (!profile() && !loading()) {
     <div class="connect-panel">
       <h1 class="title">My profile</h1>
-      <p class="lead">
-        Connect your AniList account to see your own stats and start comparisons from your profile —
-        or look up any public profile by name.
-      </p>
-      <div class="actions">
-        <hk-button variant="primary" (click)="connect()">Connect AniList</hk-button>
-        <span class="or">or</span>
-        <input
-          class="picker-input"
-          [(ngModel)]="username"
-          placeholder="AniList username"
-          (keyup.enter)="viewUser()"
-        />
-        <hk-button variant="secondary" (click)="viewUser()">View profile</hk-button>
-      </div>
-      @if (error(); as err) {
-        <div class="picker-error">{{ err }}</div>
-      }
-      <details class="advanced">
-        <summary>OAuth client ID (one-time setup)</summary>
-        <p class="hint">
-          Register a client at
-          <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener">anilist.co/settings/developer</a>
-          with redirect URL <code>{{ origin }}/auth/callback</code>, then paste the client ID here.
+      @if (auth.configured()) {
+        <p class="lead">
+          One click: approve AniMatch on AniList and you'll land right back here, signed in —
+          your own stats, and comparisons that start from you.
         </p>
         <div class="actions">
-          <input class="picker-input wide" [(ngModel)]="clientIdInput" placeholder="client id" />
-          <hk-button variant="neutral" size="sm" (click)="saveClientId()">Save</hk-button>
+          <hk-button variant="primary" (click)="connect()">Connect AniList →</hk-button>
+          <span class="or">or look up any public profile</span>
+          <input
+            class="picker-input"
+            [(ngModel)]="username"
+            placeholder="AniList username"
+            (keyup.enter)="viewUser()"
+          />
+          <hk-button variant="secondary" (click)="viewUser()">View profile</hk-button>
         </div>
-      </details>
+        @if (error(); as err) {
+          <div class="picker-error">{{ err }}</div>
+        }
+      } @else {
+        <p class="lead">
+          Look up any public AniList profile by name. Signing in isn't enabled on this deployment
+          yet — everything else works without an account.
+        </p>
+        <div class="actions">
+          <input
+            class="picker-input"
+            [(ngModel)]="username"
+            placeholder="AniList username"
+            (keyup.enter)="viewUser()"
+          />
+          <hk-button variant="primary" (click)="viewUser()">View profile</hk-button>
+        </div>
+        @if (error(); as err) {
+          <div class="picker-error">{{ err }}</div>
+        }
+        <details class="advanced">
+          <summary>Site owner: enable one-click AniList sign-in</summary>
+          <p class="hint">
+            Register a client at
+            <a href="https://anilist.co/settings/developer" target="_blank" rel="noopener">anilist.co/settings/developer</a>
+            with redirect URL <code>{{ origin }}/auth/callback</code>, then set the ID in
+            <code>src/app/anilist.config.ts</code> — or paste it here for this browser only.
+          </p>
+          <div class="actions">
+            <input class="picker-input wide" [(ngModel)]="clientIdInput" placeholder="client id" />
+            <hk-button variant="neutral" size="sm" (click)="saveClientId()">Save</hk-button>
+          </div>
+        </details>
+      }
     </div>
   }
 

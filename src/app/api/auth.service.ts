@@ -6,14 +6,11 @@ export interface ViewerIdentity {
   avatar: string | null;
 }
 
-/**
- * AniList OAuth, implicit grant — the right fit for a backend-less SPA.
- * Register a client at https://anilist.co/settings/developer with this app's
- * URL as the redirect URI (e.g. https://your-app.vercel.app/auth/callback),
- * then either set DEFAULT_CLIENT_ID at build time or paste the ID into the
- * profile page at runtime (persisted to localStorage).
- */
-const DEFAULT_CLIENT_ID = '';
+import { ANILIST_CLIENT_ID } from '../anilist.config';
+
+// AniList OAuth, implicit grant — the right fit for a backend-less SPA.
+// The client ID is app-level config (see anilist.config.ts); end users just
+// click "Connect AniList" and approve.
 
 const TOKEN_KEY = 'animatch.token';
 const EXPIRY_KEY = 'animatch.tokenExpiry';
@@ -26,7 +23,7 @@ export class AuthService {
   /** Populated by the app shell once the token is verified against AniList. */
   readonly viewer = signal<ViewerIdentity | null>(null);
 
-  readonly clientId = signal<string>(localStorage.getItem(CLIENT_ID_KEY) || DEFAULT_CLIENT_ID);
+  readonly clientId = signal<string>(localStorage.getItem(CLIENT_ID_KEY) || ANILIST_CLIENT_ID);
   readonly configured = computed(() => this.clientId().trim().length > 0);
 
   private readStoredToken(): string | null {

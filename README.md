@@ -8,7 +8,8 @@ Compare anime taste between [AniList](https://anilist.co) users. One place that 
 
 - ⚖️ **Head-to-head compare** — a 0–100 taste match score broken down into score correlation, genre overlap, completed overlap, and studio affinity.
 - 💥 **Biggest disagreements** — the titles you two scored furthest apart, with per-user scores and delta badges.
-- 📊 **Score distributions & genre profiles** — side-by-side histograms and per-genre bars for both users.
+- 📊 **Score distributions & genre profiles** — side-by-side histograms and per-genre bars, with a radar-spread toggle.
+- 🎯 **Recommendations** — top picks neither of you has listed, ranked by predicted mutual enjoyment with a reason per pick.
 - 📚 **Shared backlog** — titles in both plan-to-watch lists, ranked by predicted mutual score, with watch-together picks.
 - 👥 **Groups** — member stats, a pairwise taste-match heat matrix, and the backlog shared by the whole group.
 - 📱 **Mobile layout** — compact summary view with bottom navigation under 720px.
@@ -38,4 +39,4 @@ npm run e2e      # end-to-end tests (playwright, starts its own dev server)
 
 Built for [Vercel](https://vercel.com) — import the repo at vercel.com/new and the included `vercel.json` handles the SPA rewrites and output directory. CI (build + unit + e2e) runs on every push via GitHub Actions.
 
-To enable "Connect AniList" on a deployment: register an API client at [anilist.co/settings/developer](https://anilist.co/settings/developer) with redirect URL `https://<your-domain>/auth/callback`, then paste the client ID into the one-time setup on the profile page (or set it as the default in `src/app/api/auth.service.ts`).
+To enable one-click "Connect AniList" (site owner, once): register an API client at [anilist.co/settings/developer](https://anilist.co/settings/developer) with redirect URL `https://<your-domain>/auth/callback` and set the client ID in `src/app/anilist.config.ts`. End users then just click Connect → approve → done.

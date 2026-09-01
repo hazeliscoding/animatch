@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SAMPLE_PAIR } from '../anilist.config';
 import { PairStore } from '../api/pair-store';
 import { DEMO_BACKLOG } from '../data/demo-backlog';
 import {
@@ -38,6 +39,13 @@ export class BacklogPage {
 
   nameA = '';
   nameB = '';
+  readonly samplePair = SAMPLE_PAIR;
+
+  loadSample() {
+    this.nameA = SAMPLE_PAIR.a;
+    this.nameB = SAMPLE_PAIR.b;
+    void this.load();
+  }
 
   readonly live = computed(() => this.view() !== null);
   readonly display = computed(() => this.view() ?? DEMO_BACKLOG);

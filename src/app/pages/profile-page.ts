@@ -95,7 +95,7 @@ export class ProfilePage {
 
   connect() {
     if (!this.auth.login()) {
-      this.error.set('Set an AniList OAuth client ID below first (register one at anilist.co/settings/developer).');
+      this.error.set('Sign-in is not configured on this deployment — see the site-owner setup below.');
     }
   }
 

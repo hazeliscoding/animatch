@@ -1,6 +1,7 @@
 import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { SAMPLE_PAIR } from '../anilist.config';
 import { AuthService } from '../api/auth.service';
 import { HistoryStore, relativeTime } from '../api/history-store';
 import { HkButton } from '../ui/button';
@@ -20,6 +21,7 @@ export class HomePage {
   nameB = '';
 
   readonly rel = relativeTime;
+  readonly samplePair = SAMPLE_PAIR;
 
   readonly steps = [
     {

@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SAMPLE_PAIR } from '../anilist.config';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HistoryStore } from '../api/history-store';
@@ -9,11 +10,12 @@ import { ComparisonView, buildComparison } from '../logic/comparison-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
 import { HkDataTable, TableColumn } from '../ui/data-table';
+import { HkGenreRadar } from '../ui/genre-radar';
 import { HkModule } from '../ui/module';
 
 @Component({
   selector: 'app-compare-page',
-  imports: [FormsModule, HkBreadcrumbs, HkButton, HkDataTable, HkModule],
+  imports: [FormsModule, HkBreadcrumbs, HkButton, HkDataTable, HkGenreRadar, HkModule],
   templateUrl: './compare-page.html',
   styleUrl: './compare-page.css',
 })
@@ -28,9 +30,17 @@ export class ComparePage {
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly editing = signal(false);
+  readonly genreView = signal<'bars' | 'radar'>('bars');
 
   nameA = '';
   nameB = '';
+  readonly samplePair = SAMPLE_PAIR;
+
+  loadSample() {
+    this.nameA = SAMPLE_PAIR.a;
+    this.nameB = SAMPLE_PAIR.b;
+    void this.compare();
+  }
 
   readonly sharedCols = computed<TableColumn[]>(() => [
     { key: 'title', label: 'Title' },

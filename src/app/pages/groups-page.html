@@ -31,7 +31,10 @@
     @if (error(); as err) {
       <div class="picker-error">{{ err }}</div>
     } @else if (!live()) {
-      <div class="picker-note">Showing demo data — add 2–5 AniList usernames to build a real group.</div>
+      <div class="picker-note">
+        Showing demo data — add 2–5 AniList usernames to build a real group, or
+        <a href="#" (click)="$event.preventDefault(); loadSample()">load a sample group →</a>
+      </div>
     }
   </div>
 

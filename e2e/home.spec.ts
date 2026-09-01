@@ -34,6 +34,33 @@ test('hero form starts a comparison', async ({ page }) => {
   await expect(page.locator('.user-name').first()).toHaveText(/alice/);
 });
 
+test('hero "try it live" link loads the sample pair', async ({ page }) => {
+  await mockAnilist(page);
+  await page.goto('/');
+  await page.getByRole('link', { name: /Try it live/ }).click();
+  await expect(page).toHaveURL(/compare\?a=Anime&b=Kira/);
+  await expect(page.locator('.user-name').first()).toHaveText(/Anime/);
+  await expect(page.locator('.demo-badge')).toHaveCount(0);
+});
+
+test('compare demo note offers a live sample link', async ({ page }) => {
+  await mockAnilist(page);
+  await page.goto('/compare');
+  await page.getByRole('link', { name: /load a live sample/ }).click();
+  await expect(page.locator('.user-name').first()).toHaveText(/Anime/);
+  await expect(page).toHaveURL(/a=Anime&b=Kira/);
+});
+
+test('genre profile toggles between bars and radar', async ({ page }) => {
+  await page.goto('/compare');
+  await expect(page.locator('.genres')).toBeVisible();
+  await page.getByRole('tab', { name: 'Radar' }).click();
+  await expect(page.locator('hk-genre-radar svg')).toBeVisible();
+  await expect(page.locator('polygon.series')).toHaveCount(2);
+  await page.getByRole('tab', { name: 'Bars' }).click();
+  await expect(page.locator('.genres')).toBeVisible();
+});
+
 test('demo link shows a clearly-labeled demo comparison', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'See a demo comparison →' }).click();

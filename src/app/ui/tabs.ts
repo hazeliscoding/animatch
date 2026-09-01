@@ -9,14 +9,16 @@ export interface TabItem {
   selector: 'hk-tabs',
   template: `
     <div role="tablist" class="tabs" [class.sm]="size() === 'sm'">
-      @for (item of items(); track item.label) {
+      @for (item of items(); track item.label; let i = $index) {
         <button
           role="tab"
           type="button"
           [attr.aria-selected]="item.label === active()"
+          [attr.tabindex]="item.label === active() ? 0 : -1"
           class="tab"
           [class.sel]="item.label === active()"
           (click)="change.emit(item.label)"
+          (keydown)="onKeydown($event, i)"
         >
           {{ item.label }}
           @if (item.count != null) {
@@ -51,4 +53,14 @@ export class HkTabs {
   readonly active = input<string>();
   readonly size = input<'md' | 'sm'>('md');
   readonly change = output<string>();
+
+  onKeydown(e: KeyboardEvent, i: number) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    e.preventDefault();
+    const items = this.items();
+    const next = (i + (e.key === 'ArrowRight' ? 1 : items.length - 1)) % items.length;
+    this.change.emit(items[next].label);
+    const buttons = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll('button');
+    buttons?.[next]?.focus();
+  }
 }

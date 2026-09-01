@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HistoryStore } from '../api/history-store';
 import { PairStore } from '../api/pair-store';
-import { ComparisonView, buildComparison } from '../logic/comparison-engine';
+import { ComparisonView, HistBin, buildComparison, histSummary } from '../logic/comparison-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
 import { HkDataTable, TableColumn } from '../ui/data-table';
@@ -40,8 +40,19 @@ export class ComparePage {
     { key: 'title', label: 'Title' },
     { key: 'a', label: this.view()?.userA.name ?? 'User A', align: 'right', sortable: true },
     { key: 'b', label: this.view()?.userB.name ?? 'User B', align: 'right', sortable: true },
-    { key: 'd', label: 'Δ', align: 'right', sortable: true },
+    { key: 'd', label: 'diff', align: 'right', sortable: true },
   ]);
+
+  histLabel(bins: HistBin[], name: string): string {
+    return histSummary(bins, name);
+  }
+
+  scoreHint(score: number): string {
+    if (score >= 70) return 'Strong match';
+    if (score >= 45) return 'Solid overlap';
+    if (score >= 25) return 'Some common ground';
+    return 'Very different lanes';
+  }
 
   readonly crumbs = computed(() => [
     { label: 'Home', path: '/' },

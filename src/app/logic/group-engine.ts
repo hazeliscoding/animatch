@@ -6,10 +6,16 @@ import { completedOf, pairCompatScore } from './comparison-engine';
 
 export interface MatrixCell {
   v: string;
-  kind: 'head' | 'self' | 'strong' | 'medium' | 'weak';
+  kind: 'self' | 'strong' | 'medium' | 'weak';
+}
+
+export interface MatrixRow {
+  user: string;
+  cells: MatrixCell[];
 }
 
 export interface GroupBacklogItem {
+  mediaId: number;
   title: string;
   meta: string;
   chip: string;
@@ -21,7 +27,7 @@ export interface GroupView {
   users: string[];
   attrs: ComparisonAttribute[];
   highlight: Record<string, number>;
-  matrixCells: MatrixCell[];
+  matrixRows: MatrixRow[];
   backlog: GroupBacklogItem[];
   backlogTotal: number;
 }
@@ -57,18 +63,16 @@ export function buildGroup(lists: AnilistUserList[]): GroupView {
     }
   }
 
-  const matrixCells: MatrixCell[] = [];
-  users.forEach((row, i) => {
-    matrixCells.push({ v: row, kind: 'head' });
-    users.forEach((_, j) => {
-      if (i === j) {
-        matrixCells.push({ v: '—', kind: 'self' });
-        return;
-      }
+  // Bands calibrated to observed real-world pair scores: casual pairs land in
+  // the 20s–40s, genuinely aligned pairs in the 60s+.
+  const matrixRows: MatrixRow[] = users.map((user, i) => ({
+    user,
+    cells: users.map((_, j) => {
+      if (i === j) return { v: '—', kind: 'self' as const };
       const v = pair[i][j];
-      matrixCells.push({ v: String(v), kind: v >= 70 ? 'strong' : v >= 50 ? 'medium' : 'weak' });
-    });
-  });
+      return { v: String(v), kind: v >= 60 ? ('strong' as const) : v >= 40 ? ('medium' as const) : ('weak' as const) };
+    }),
+  }));
 
   const fitWithGroup = lists.map((_, i) => {
     const others = pair[i].filter((_, j) => j !== i);
@@ -98,12 +102,13 @@ export function buildGroup(lists: AnilistUserList[]): GroupView {
   // titles planned (or started) by 2+ members
   const interest = new Map<
     number,
-    { title: string; meta: string; popularity: number; members: string[] }
+    { mediaId: number; title: string; meta: string; popularity: number; members: string[] }
   >();
   lists.forEach((l) => {
     for (const e of l.entries) {
       if (e.status !== 'PLANNING' && e.status !== 'CURRENT') continue;
       const cur = interest.get(e.mediaId) ?? {
+        mediaId: e.mediaId,
         title: e.title,
         meta: [e.format ?? '—', e.year != null ? String(e.year) : '—', e.genres.slice(0, 2).join(' / ')]
           .filter(Boolean)
@@ -130,6 +135,7 @@ export function buildGroup(lists: AnilistUserList[]): GroupView {
   };
 
   const backlog: GroupBacklogItem[] = shared.slice(0, 8).map((t) => ({
+    mediaId: t.mediaId,
     title: t.title,
     meta: t.meta,
     chip: `${t.members.length}/${n}`,
@@ -137,5 +143,5 @@ export function buildGroup(lists: AnilistUserList[]): GroupView {
     who: whoOf(t.members),
   }));
 
-  return { users, attrs, highlight, matrixCells, backlog, backlogTotal: shared.length };
+  return { users, attrs, highlight, matrixRows, backlog, backlogTotal: shared.length };
 }

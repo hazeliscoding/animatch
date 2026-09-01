@@ -23,7 +23,12 @@ export interface ComparisonAttribute {
             <tr>
               <th scope="row" class="attr">{{ attr.label }}</th>
               @for (v of attr.values; track $index; let c = $index) {
-                <td class="val" [class.best]="highlight()[attr.label] === c">{{ v }}</td>
+                <td class="val" [class.best]="highlight()[attr.label] === c">
+                  {{ v }}
+                  @if (highlight()[attr.label] === c) {
+                    <span class="hk-visually-hidden">(highest)</span>
+                  }
+                </td>
               }
             </tr>
           }
@@ -48,7 +53,8 @@ export interface ComparisonAttribute {
       font-variant-numeric: tabular-nums;
       background: var(--color-surface);
     }
-    .val.best { background: var(--color-notice-subtle); font-weight: 700; color: var(--color-danger); }
+    .val.best { background: var(--color-success-subtle); font-weight: 700; color: var(--green-700); }
+    .corner, .attr { background: var(--color-surface-subtle); }
   `,
 })
 export class HkComparisonTable {

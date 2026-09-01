@@ -33,6 +33,7 @@
       @if (loading()) {
         <span class="picker-note">Loading lists…</span>
       }
+      <span class="hk-visually-hidden" aria-live="polite">{{ loading() ? 'Loading lists from AniList…' : '' }}</span>
     </div>
     @if (error(); as err) {
       <div class="picker-error" role="alert">{{ err }}</div>
@@ -55,17 +56,29 @@
 
     <div class="grid">
       <hk-module title="Pairwise taste match" [pad]="true">
-        <div class="matrix" [style.grid-template-columns]="'110px repeat(' + g.users.length + ', 1fr)'">
-          <div></div>
-          @for (u of g.users; track u) {
-            <div class="m-head">{{ u }}</div>
-          }
-          @for (c of g.matrixCells; track $index) {
-            <div class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</div>
-          }
-        </div>
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <td></td>
+              @for (u of g.users; track u) {
+                <th scope="col" class="m-head">{{ u }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of g.matrixRows; track row.user) {
+              <tr>
+                <th scope="row" class="m-row-head">{{ row.user }}</th>
+                @for (c of row.cells; track $index) {
+                  <td class="m-cell" [class]="'k-' + c.kind">{{ c.v }}</td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
         <div class="matrix-note">
-          Match score combines score correlation and genre overlap on completed lists. 70+ = strong match.
+          Match score combines score correlation and genre overlap on completed lists. 60+ = strong match,
+          40+ = decent overlap.
         </div>
       </hk-module>
 
@@ -75,7 +88,7 @@
             <div class="row">
               <span class="chip" [class]="'chip-' + b.chipKind">{{ b.chip }}</span>
               <div class="main">
-                <a href="#" (click)="$event.preventDefault()" class="row-title">{{ b.title }}</a>
+                <a [href]="'https://anilist.co/anime/' + b.mediaId" target="_blank" rel="noopener" class="row-title">{{ b.title }}</a>
                 <div class="meta">{{ b.meta }}</div>
               </div>
               <div class="who">{{ b.who }}</div>

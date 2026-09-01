@@ -41,7 +41,7 @@
   min-width: 0;
   width: 180px;
 }
-.picker-input:focus { border-color: var(--color-primary); outline: none; }
+.picker-input:focus { border-color: var(--color-primary); }
 .picker-error {
   font-size: 12px;
   font-weight: 700;
@@ -127,3 +127,10 @@
 
 .how { display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--color-text); line-height: 1.55; }
 .how .muted { color: var(--color-text-muted); font-size: 12px; }
+
+/* Stack list rows on narrow screens so titles keep a readable column */
+@media (max-width: 719px) {
+  .item { flex-wrap: wrap; }
+  .item .main { flex: 1 1 calc(100% - 96px); }
+  .item .scores { margin-left: 96px; text-align: left; flex: 1 1 auto; }
+}

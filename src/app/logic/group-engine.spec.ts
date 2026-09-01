@@ -48,9 +48,9 @@ describe('buildGroup', () => {
   const view = buildGroup([alice, bob, carol]);
 
   it('builds a symmetric pairwise matrix with heat kinds', () => {
-    // 3 users -> 3 header cells + 9 value cells
-    expect(view.matrixCells).toHaveLength(12);
-    const cellAt = (row: number, col: number) => view.matrixCells[row * 4 + 1 + col];
+    expect(view.matrixRows).toHaveLength(3);
+    expect(view.matrixRows[0].user).toBe('alice');
+    const cellAt = (row: number, col: number) => view.matrixRows[row].cells[col];
     expect(cellAt(0, 0).kind).toBe('self');
     expect(cellAt(0, 2).v).toBe(cellAt(2, 0).v); // alice×carol symmetric
     expect(cellAt(0, 2).kind).toBe('strong'); // near-identical scores

@@ -22,6 +22,7 @@ export interface BreakdownItem {
 export interface HistBin {
   bin: number;
   px: number;
+  count: number;
 }
 
 export interface GenreRow {
@@ -32,6 +33,7 @@ export interface GenreRow {
 }
 
 export interface DisagreementView {
+  mediaId: number;
   title: string;
   meta: string;
   a: string;
@@ -134,7 +136,13 @@ export function histogram(entries: AnimeEntry[]): HistBin[] {
     counts[bin - 1]++;
   }
   const max = Math.max(1, ...counts);
-  return counts.map((v, i) => ({ bin: i + 1, px: Math.round((v / max) * 60) }));
+  return counts.map((v, i) => ({ bin: i + 1, px: Math.round((v / max) * 60), count: v }));
+}
+
+/** Text alternative for a histogram, e.g. "Anime's score counts — 7: 30, 8: 52, …" */
+export function histSummary(bins: HistBin[], name: string): string {
+  const parts = bins.filter((b) => b.count > 0).map((b) => `${b.bin}: ${b.count}`);
+  return `${name}'s score counts — ${parts.length ? parts.join(', ') : 'no scored titles'}`;
 }
 
 const fmt1 = (v: number) => (Math.round(v * 10) / 10).toFixed(1);
@@ -235,6 +243,7 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     (p, q) => Math.abs(q.a.score! - q.b.score!) - Math.abs(p.a.score! - p.b.score!),
   );
   const disagreements: DisagreementView[] = byDeltaDesc.slice(0, 4).map((p) => ({
+    mediaId: p.a.mediaId,
     title: p.a.title,
     meta: metaOf(p.a),
     a: fmt1(p.a.score!),

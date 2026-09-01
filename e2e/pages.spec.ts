@@ -26,7 +26,7 @@ test('groups page renders member stats and pairwise matrix', async ({ page }) =>
   await mockAnilist(page);
   await page.goto('/groups?users=alice,bob');
   await expect(page.getByRole('heading', { name: /Watch group/ })).toBeVisible();
-  await expect(page.getByRole('columnheader', { name: 'alice' })).toBeVisible();
+  await expect(page.locator('hk-comparison-table').getByRole('columnheader', { name: 'alice' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Pairwise taste match' })).toBeVisible();
   await expect(page.locator('.m-cell').nth(1)).not.toBeEmpty();
   await expect(page.getByRole('heading', { name: 'Backlog shared by the group' })).toBeVisible();

@@ -42,7 +42,8 @@ export class GroupsPage {
   ];
 
   constructor() {
-    const usersParam = this.route.snapshot.queryParamMap.get('users');
+    const qp = this.route.snapshot.queryParamMap;
+    const usersParam = qp.get('users');
     if (usersParam) {
       const names = usersParam
         .split(',')
@@ -51,6 +52,14 @@ export class GroupsPage {
         .slice(0, MAX_MEMBERS);
       this.members.set(names);
       if (names.length >= 2) void this.load();
+      return;
+    }
+    // Arriving from Compare/Backlog with a pair in the URL: seed the group.
+    const a = qp.get('a');
+    const b = qp.get('b');
+    if (a && b) {
+      this.members.set([a, b]);
+      void this.load();
     }
   }
 

@@ -15,6 +15,7 @@
           class="picker-input"
           [(ngModel)]="nameA"
           placeholder="first username"
+          aria-label="First AniList username"
           [disabled]="loading()"
           (keyup.enter)="load()"
         />
@@ -23,6 +24,7 @@
           class="picker-input"
           [(ngModel)]="nameB"
           placeholder="second username"
+          aria-label="Second AniList username"
           [disabled]="loading()"
           (keyup.enter)="load()"
         />
@@ -30,6 +32,7 @@
           {{ loading() ? 'Crunching lists…' : 'Recommend' }}
         </hk-button>
       </div>
+      <span class="hk-visually-hidden" aria-live="polite">{{ loading() ? 'Loading recommendations from AniList…' : '' }}</span>
       @if (error(); as err) {
         <div class="picker-error" role="alert">{{ err }}</div>
       } @else {
@@ -72,7 +75,7 @@
             }
           </div>
           <div class="main">
-            <a href="#" (click)="$event.preventDefault()" class="item-title">{{ r.title }}</a>
+            <a [href]="'https://anilist.co/anime/' + r.mediaId" target="_blank" rel="noopener" class="item-title">{{ r.title }}</a>
             <div class="meta">{{ r.meta }} · {{ r.genres }}</div>
             <div class="note">{{ r.reason }}</div>
           </div>

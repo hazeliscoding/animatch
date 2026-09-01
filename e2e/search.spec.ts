@@ -32,37 +32,41 @@ test('header search finds users and fills the compare pair', async ({ page }) =>
   await mockAnilist(page);
   await page.goto('/compare');
 
-  const searchBox = page.getByRole('searchbox', { name: 'Search AniList users' });
+  const searchBox = page.getByRole('searchbox', { name: 'Search AniList users' }).first();
   await searchBox.fill('ali');
-  const dropdown = page.locator('.search-results');
-  await expect(dropdown.getByRole('option', { name: /alice/ })).toBeVisible();
+  const dropdown = page.locator('.search-results').first();
+  await expect(dropdown.getByRole('button', { name: /alice/ })).toBeVisible();
   await expect(dropdown.getByText('123 anime')).toBeVisible();
 
   // first pick fills slot a and opens the picker with it
-  await dropdown.getByRole('option', { name: /alice/ }).click();
+  await dropdown.getByRole('button', { name: /alice/ }).click();
   await expect(page).toHaveURL(/compare\?a=alice/);
   await expect(page.getByPlaceholder('first username')).toHaveValue('alice');
+  await expect(page.getByText('Now add a second username')).toBeVisible();
 
   // second pick fills slot b and triggers the live comparison
   await searchBox.fill('bo');
-  await dropdown.getByRole('option', { name: /bob/ }).click();
+  await dropdown.getByRole('button', { name: /bob/ }).click();
   await expect(page).toHaveURL(/a=alice&b=bob/);
   await expect(page.locator('.user-name').first()).toHaveText('alice');
   await expect(page.locator('.user-name').nth(1)).toHaveText('bob');
 });
 
-test('dropdown closes on outside click and Escape clears it', async ({ page }) => {
+test('dropdown closes on outside click, Escape, and arrow keys rove options', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/compare');
-  const searchBox = page.getByRole('searchbox', { name: 'Search AniList users' });
+  const searchBox = page.getByRole('searchbox', { name: 'Search AniList users' }).first();
 
   await searchBox.fill('ali');
-  await expect(page.locator('.search-results')).toBeVisible();
+  await expect(page.locator('.search-results').first()).toBeVisible();
   await page.getByRole('heading', { name: 'Pick two users to compare' }).click();
   await expect(page.locator('.search-results')).toHaveCount(0);
 
   await searchBox.fill('ali');
-  await expect(page.locator('.search-results')).toBeVisible();
+  await expect(page.locator('.search-results').first()).toBeVisible();
+  await searchBox.press('ArrowDown');
+  await expect(page.locator('.search-results').first().getByRole('button', { name: /alice/ })).toBeFocused();
   await searchBox.press('Escape');
   await expect(page.locator('.search-results')).toHaveCount(0);
+  await expect(searchBox).toBeFocused();
 });

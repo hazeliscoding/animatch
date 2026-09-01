@@ -1,18 +1,20 @@
 <div class="shell">
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
   <!-- Desktop chrome -->
   <div class="desktop-only">
     <hk-utility-bar [left]="utilLeft" [right]="utilRight()" (actionClick)="onUtilAction($event)" />
     <hk-global-header brand="AniMatch" tagline="for AniList">
-      <div class="search-wrap">
+      <div class="search-wrap" (keydown)="onSearchKeydown($event)" (focusout)="onSearchFocusout($event)">
         <hk-search-input
           placeholder="Search AniList users"
           (query)="onSearchQuery($event)"
           (search)="onSearchSubmit($event)"
         />
         @if (searchOpen()) {
-          <div class="search-results" role="listbox">
+          <div class="search-results">
             @for (u of searchResults(); track u.id) {
-              <button type="button" role="option" class="result" (click)="pickUser(u.name)">
+              <button type="button" class="result" (click)="pickUser(u.name)">
                 @if (u.avatar) {
                   <img [src]="u.avatar" alt="" class="r-avatar" />
                 } @else {
@@ -32,31 +34,51 @@
   </div>
 
   <!-- Mobile chrome -->
-  <div class="mobile-header mobile-only">
-    <a routerLink="/" class="m-brand">AniMatch</a>
-    <span class="m-tagline">for AniList</span>
-    @if (auth.connected()) {
-      <a routerLink="/profile" class="m-signin">{{ viewer()?.name ?? 'Profile' }}</a>
-    } @else {
-      <a href="#" class="m-signin" (click)="$event.preventDefault(); onUtilAction('connect')">Sign in</a>
-    }
+  <div class="mobile-only">
+    <div class="mobile-header">
+      <a routerLink="/" class="m-brand">AniMatch</a>
+      <span class="m-tagline">for AniList</span>
+      @if (auth.connected()) {
+        <a routerLink="/profile" class="m-signin">{{ viewer()?.name ?? 'Profile' }}</a>
+      } @else {
+        <a href="#" class="m-signin" (click)="$event.preventDefault(); onUtilAction('connect')">Sign in</a>
+      }
+    </div>
+    <div class="mobile-search search-wrap" (keydown)="onSearchKeydown($event)" (focusout)="onSearchFocusout($event)">
+      <hk-search-input
+        placeholder="Search AniList users"
+        (query)="onSearchQuery($event)"
+        (search)="onSearchSubmit($event)"
+      />
+      @if (searchOpen()) {
+        <div class="search-results">
+          @for (u of searchResults(); track u.id) {
+            <button type="button" class="result" (click)="pickUser(u.name)">
+              @if (u.avatar) {
+                <img [src]="u.avatar" alt="" class="r-avatar" />
+              } @else {
+                <span class="r-avatar ph">{{ u.name.charAt(0).toUpperCase() }}</span>
+              }
+              <span class="r-name">{{ u.name }}</span>
+              <span class="r-meta">{{ u.completed }} anime</span>
+            </button>
+          } @empty {
+            <div class="result none">No users found</div>
+          }
+        </div>
+      }
+    </div>
   </div>
 
-  <main class="content">
+  <main class="content" id="main-content" tabindex="-1">
     <router-outlet />
   </main>
 
   <nav class="mobile-nav mobile-only" aria-label="Primary">
     @for (m of mobileNav; track m.label) {
-      @if (m.path) {
-        <a [routerLink]="m.path" queryParamsHandling="preserve" routerLinkActive="active" class="m-item">
-          <span class="glyph">{{ m.glyph }}</span>{{ m.label }}
-        </a>
-      } @else {
-        <a href="#" class="m-item" (click)="$event.preventDefault()">
-          <span class="glyph">{{ m.glyph }}</span>{{ m.label }}
-        </a>
-      }
+      <a [routerLink]="m.path" queryParamsHandling="preserve" routerLinkActive="active" class="m-item">
+        <span class="glyph" aria-hidden="true">{{ m.glyph }}</span>{{ m.label }}
+      </a>
     }
   </nav>
 </div>

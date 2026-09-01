@@ -43,7 +43,7 @@
   min-width: 0;
   width: 180px;
 }
-.picker-input:focus { border-color: var(--color-primary); outline: none; }
+.picker-input:focus { border-color: var(--color-primary); }
 .picker-error {
   font-size: 12px;
   font-weight: 700;
@@ -68,9 +68,11 @@
   border: 0;
   background: transparent;
   color: var(--blue-700);
-  font-size: 13px;
+  font-size: 15px;
   line-height: 1;
-  padding: 0 2px;
+  /* small glyph, comfortable hit area */
+  padding: 10px 8px;
+  margin: -10px -6px -10px -4px;
   cursor: pointer;
 }
 .chip-x:hover { color: var(--red-600); }
@@ -81,10 +83,10 @@
   .grid { grid-template-columns: 1fr; }
 }
 
-.matrix {
-  display: grid;
-  grid-template-columns: 110px repeat(4, 1fr);
-  gap: 2px;
+.matrix-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
@@ -96,6 +98,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 90px;
+}
+.m-row-head {
+  padding: 8px 4px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  width: 110px;
 }
 .m-cell {
   padding: 8px 4px;
@@ -104,7 +115,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.m-cell.k-head { background: transparent; color: var(--color-text-secondary); font-weight: 700; text-align: left; }
 .m-cell.k-self { background: var(--gray-150); color: var(--color-text-muted); }
 .m-cell.k-strong { background: var(--green-50); color: var(--green-700); font-weight: 700; }
 .m-cell.k-medium { background: var(--yellow-50); color: var(--yellow-800); }

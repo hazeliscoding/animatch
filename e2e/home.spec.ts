@@ -55,10 +55,10 @@ test('genre profile toggles between bars and radar', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/compare?a=alice&b=bob');
   await expect(page.locator('.genres')).toBeVisible();
-  await page.getByRole('tab', { name: 'Radar' }).click();
+  await page.getByRole('button', { name: 'Radar' }).click();
   await expect(page.locator('hk-genre-radar svg')).toBeVisible();
   await expect(page.locator('polygon.series')).toHaveCount(2);
-  await page.getByRole('tab', { name: 'Bars' }).click();
+  await page.getByRole('button', { name: 'Bars' }).click();
   await expect(page.locator('.genres')).toBeVisible();
 });
 

@@ -16,6 +16,7 @@
             class="picker-input"
             [(ngModel)]="username"
             placeholder="AniList username"
+            aria-label="AniList username to look up"
             (keyup.enter)="viewUser()"
           />
           <hk-button variant="secondary" (click)="viewUser()">View profile</hk-button>
@@ -33,6 +34,7 @@
             class="picker-input"
             [(ngModel)]="username"
             placeholder="AniList username"
+            aria-label="AniList username to look up"
             (keyup.enter)="viewUser()"
           />
           <hk-button variant="primary" (click)="viewUser()">View profile</hk-button>
@@ -49,7 +51,7 @@
             <code>src/app/anilist.config.ts</code> — or paste it here for this browser only.
           </p>
           <div class="actions">
-            <input class="picker-input wide" [(ngModel)]="clientIdInput" placeholder="client id" />
+            <input class="picker-input wide" [(ngModel)]="clientIdInput" placeholder="client id" aria-label="AniList OAuth client id" />
             <hk-button variant="neutral" size="sm" (click)="saveClientId()">Save</hk-button>
           </div>
         </details>
@@ -108,15 +110,17 @@
         </hk-module>
 
         <hk-module title="Score distribution" [pad]="true">
-          <div class="hist-bars">
-            @for (h of p.hist; track h.bin) {
-              <div class="hist-col"><div class="bar" [style.height.px]="h.px"></div></div>
-            }
-          </div>
-          <div class="hist-bins">
-            @for (h of p.hist; track h.bin) {
-              <div class="bin">{{ h.bin }}</div>
-            }
+          <div role="img" [attr.aria-label]="histLabel(p.hist, p.name)">
+            <div class="hist-bars">
+              @for (h of p.hist; track h.bin) {
+                <div class="hist-col"><div class="bar" [style.height.px]="h.px"></div></div>
+              }
+            </div>
+            <div class="hist-bins">
+              @for (h of p.hist; track h.bin) {
+                <div class="bin">{{ h.bin }}</div>
+              }
+            </div>
           </div>
         </hk-module>
 

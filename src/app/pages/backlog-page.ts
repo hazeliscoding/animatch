@@ -56,9 +56,12 @@ export class BacklogPage {
     const d = this.view();
     return d ? sortBacklogItems(d.items, this.sort()) : [];
   });
-  readonly visibleItems = computed(() =>
-    this.showAll() ? this.sortedItems() : this.sortedItems().slice(0, VISIBLE_LIMIT),
-  );
+  readonly visibleItems = computed(() => {
+    const items = this.sortedItems();
+    // Don't tease a "Show all" link for one or two hidden rows
+    if (this.showAll() || items.length <= VISIBLE_LIMIT + 2) return items;
+    return items.slice(0, VISIBLE_LIMIT);
+  });
   readonly hiddenCount = computed(() => this.sortedItems().length - this.visibleItems().length);
   readonly visibleOnlyOne = computed(() => this.view()?.onlyOne.slice(0, 12) ?? []);
 

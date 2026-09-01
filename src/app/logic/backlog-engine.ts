@@ -9,6 +9,7 @@ import { completedOf } from './comparison-engine';
 export type BacklogSort = 'Predicted score' | 'Popularity' | 'Year';
 
 export interface BacklogItemView {
+  mediaId: number;
   title: string;
   meta: string;
   note: string;
@@ -21,6 +22,7 @@ export interface BacklogItemView {
 }
 
 export interface SingleBacklogItemView {
+  mediaId: number;
   title: string;
   meta: string;
   who: string;
@@ -29,6 +31,7 @@ export interface SingleBacklogItemView {
 }
 
 export interface WatchingItemView {
+  mediaId: number;
   title: string;
   meta: string;
   note: string;
@@ -37,6 +40,7 @@ export interface WatchingItemView {
 
 export interface PickView {
   rank: number;
+  mediaId: number;
   title: string;
   reason: string;
   medal: 'gold' | 'silver' | 'bronze' | 'none';
@@ -155,6 +159,7 @@ export function buildBacklog(a: AnilistUserList, b: AnilistUserList): BacklogVie
   const claimed = new Set<number>();
   const addItem = (e: AnimeEntry, chipKind: 'both' | 'started', chip: string, note: string) => {
     items.push({
+      mediaId: e.mediaId,
       title: e.title,
       meta: metaOf(e),
       note,
@@ -190,10 +195,10 @@ export function buildBacklog(a: AnilistUserList, b: AnilistUserList): BacklogVie
   const onlyOne: SingleBacklogItemView[] = [
     ...planA
       .filter((e) => !planBIds.has(e.mediaId) && !watchBIds.has(e.mediaId))
-      .map((e) => ({ title: e.title, meta: metaOf(e), who: `only ${a.name}`, cover: e.cover, popularity: e.popularity })),
+      .map((e) => ({ mediaId: e.mediaId, title: e.title, meta: metaOf(e), who: `only ${a.name}`, cover: e.cover, popularity: e.popularity })),
     ...planB
       .filter((e) => !claimed.has(e.mediaId) && !watchAIds.has(e.mediaId))
-      .map((e) => ({ title: e.title, meta: metaOf(e), who: `only ${b.name}`, cover: e.cover, popularity: e.popularity })),
+      .map((e) => ({ mediaId: e.mediaId, title: e.title, meta: metaOf(e), who: `only ${b.name}`, cover: e.cover, popularity: e.popularity })),
   ].sort((x, y) => y.popularity - x.popularity);
 
   const watching: WatchingItemView[] = watchA
@@ -201,6 +206,7 @@ export function buildBacklog(a: AnilistUserList, b: AnilistUserList): BacklogVie
     .map((e) => {
       const w = watchBIds.get(e.mediaId)!;
       return {
+        mediaId: e.mediaId,
         title: e.title,
         meta: metaOf(e),
         note: `${a.name} at ep ${e.progress} · ${b.name} at ep ${w.progress}`,
@@ -212,6 +218,7 @@ export function buildBacklog(a: AnilistUserList, b: AnilistUserList): BacklogVie
   const medals: PickView['medal'][] = ['gold', 'silver', 'bronze'];
   const picks: PickView[] = ranked.slice(0, 5).map((it, i) => ({
     rank: i + 1,
+    mediaId: it.mediaId,
     title: it.title,
     reason:
       i === 0

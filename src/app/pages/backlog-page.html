@@ -32,6 +32,7 @@
           {{ loading() ? 'Loading lists…' : 'Load backlogs' }}
         </hk-button>
       </div>
+      <span class="hk-visually-hidden" aria-live="polite">{{ loading() ? 'Loading lists from AniList…' : '' }}</span>
       @if (error(); as err) {
         <div class="picker-error" role="alert">{{ err }}</div>
       } @else {
@@ -53,12 +54,13 @@
             <span class="count"><strong>{{ d.bothCount }} titles</strong> in both plan-to-watch lists</span>
             <span class="sort-label">Sort:</span>
             @for (s of sorts; track s) {
-              <a
-                href="#"
+              <button
+                type="button"
                 class="sort-link"
                 [class.active]="sort() === s"
-                (click)="$event.preventDefault(); sort.set(s)"
-              >{{ s }}</a>
+                [attr.aria-pressed]="sort() === s"
+                (click)="sort.set(s)"
+              >{{ s }}</button>
             }
           </div>
           @for (k of visibleItems(); track k.title) {
@@ -72,7 +74,7 @@
               </div>
               <div class="main">
                 <div class="title-row">
-                  <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
+                  <a [href]="'https://anilist.co/anime/' + k.mediaId" target="_blank" rel="noopener" class="item-title">{{ k.title }}</a>
                   <span class="chip" [class]="'chip-' + k.chipKind">{{ k.chip }}</span>
                 </div>
                 <div class="meta">{{ k.meta }}</div>
@@ -82,7 +84,6 @@
                 <div class="predicted-label">Predicted mutual</div>
                 <div class="predicted-score">★ {{ fmt(k.predicted) }}</div>
               </div>
-              <hk-button variant="ghost" size="sm">Queue →</hk-button>
             </div>
           } @empty {
             <div class="placeholder">No titles in both plan-to-watch lists yet.</div>
@@ -103,7 +104,7 @@
                 }
               </div>
               <div class="main">
-                <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
+                <a [href]="'https://anilist.co/anime/' + k.mediaId" target="_blank" rel="noopener" class="item-title">{{ k.title }}</a>
                 <div class="meta">{{ k.meta }}</div>
               </div>
               <div class="who">{{ k.who }}</div>
@@ -125,7 +126,7 @@
                 }
               </div>
               <div class="main">
-                <a href="#" (click)="$event.preventDefault()" class="item-title">{{ k.title }}</a>
+                <a [href]="'https://anilist.co/anime/' + k.mediaId" target="_blank" rel="noopener" class="item-title">{{ k.title }}</a>
                 <div class="meta">{{ k.meta }}</div>
                 <div class="note">{{ k.note }}</div>
               </div>
@@ -143,7 +144,7 @@
               <div class="pick">
                 <span class="medal" [class]="'medal-' + p.medal">{{ p.rank }}</span>
                 <div class="pick-main">
-                  <a href="#" (click)="$event.preventDefault()" class="pick-title">{{ p.title }}</a>
+                  <a [href]="'https://anilist.co/anime/' + p.mediaId" target="_blank" rel="noopener" class="pick-title">{{ p.title }}</a>
                   <div class="pick-reason">{{ p.reason }}</div>
                 </div>
               </div>

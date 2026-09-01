@@ -27,7 +27,6 @@ import { Component, input, output } from '@angular/core';
       border: 2px solid var(--color-primary);
       border-right: 0;
       border-radius: var(--radius-control) 0 0 var(--radius-control);
-      outline: none;
       background: var(--color-surface);
     }
     .search.lg .input { font-size: var(--text-base); }

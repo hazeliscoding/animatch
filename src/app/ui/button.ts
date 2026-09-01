@@ -36,6 +36,10 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     .hk-btn:disabled { cursor: default; opacity: 0.45; }
     .hk-btn.block { display: flex; width: 100%; }
     .s-sm { height: var(--control-height-sm); }
+    /* comfortable touch targets on touch-sized viewports */
+    @media (max-width: 719px) {
+      .hk-btn { min-height: 44px; }
+    }
     .s-lg { height: var(--control-height-lg); font-size: var(--text-base); }
     .v-primary { background: var(--color-primary); color: #fff; border: 1px solid var(--color-primary); }
     .v-primary:hover:not(:disabled) { filter: brightness(0.92); }

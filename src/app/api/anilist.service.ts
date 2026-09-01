@@ -266,11 +266,13 @@ export class AnilistService {
   /** Search AniList users by name prefix. */
   async searchUsers(search: string): Promise<AnilistUserHit[]> {
     const res = await this.gql<GqlSearchResponse>(USER_SEARCH_QUERY, { search }, search);
-    return (res.data?.Page?.users ?? []).map((u) => ({
-      id: u.id,
-      name: u.name,
-      avatar: u.avatar?.medium ?? null,
-      completed: u.statistics?.anime?.count ?? 0,
-    }));
+    return (res.data?.Page?.users ?? [])
+      .map((u) => ({
+        id: u.id,
+        name: u.name,
+        avatar: u.avatar?.medium ?? null,
+        completed: u.statistics?.anime?.count ?? 0,
+      }))
+      .sort((a, b) => b.completed - a.completed);
   }
 }

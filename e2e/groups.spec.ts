@@ -24,8 +24,9 @@ test('builds a real group from the member picker', async ({ page }) => {
   await page.getByRole('button', { name: '+ Add member' }).click();
 
   await expect(page.getByRole('heading', { name: /Watch group/ })).toBeVisible();
-  await expect(page.getByRole('columnheader', { name: 'alice' })).toBeVisible();
-  await expect(page.getByRole('columnheader', { name: 'bob' })).toBeVisible();
+  const memberStats = page.locator('hk-comparison-table');
+  await expect(memberStats.getByRole('columnheader', { name: 'alice' })).toBeVisible();
+  await expect(memberStats.getByRole('columnheader', { name: 'bob' })).toBeVisible();
   await expect(page).toHaveURL(/users=alice,bob/);
 
   // both users plan "Monster Fixture" -> 2/2 everyone
@@ -38,7 +39,7 @@ test('builds a real group from the member picker', async ({ page }) => {
 test('loads a group from ?users= and supports member removal', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/groups?users=alice,bob');
-  await expect(page.getByRole('columnheader', { name: 'alice' })).toBeVisible();
+  await expect(page.locator('hk-comparison-table').getByRole('columnheader', { name: 'alice' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Remove bob' }).click();
   // below two members the page returns to the empty state

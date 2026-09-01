@@ -40,9 +40,7 @@
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-control);
   background: var(--color-surface);
-  outline: none;
 }
-.hero-input:focus { box-shadow: 0 0 0 2px var(--blue-100); }
 .hero-x { align-self: center; font-size: 15px; font-weight: 700; color: var(--color-text-muted); }
 .hero-go {
   padding: 0 24px;

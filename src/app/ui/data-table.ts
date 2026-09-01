@@ -20,15 +20,17 @@ export type TableRow = Record<string, string>;
               <th
                 scope="col"
                 [style.text-align]="c.align || 'left'"
-                [class.sortable]="c.sortable"
                 [attr.aria-sort]="sortKey() === c.key ? (sortDir() === 'asc' ? 'ascending' : 'descending') : null"
-                (click)="c.sortable && toggleSort(c.key)"
               >
-                {{ c.label }}
                 @if (c.sortable) {
-                  <span aria-hidden="true" class="arrows" [class.on]="sortKey() === c.key">{{
-                    sortKey() === c.key ? (sortDir() === 'asc' ? '▲' : '▼') : '▲▼'
-                  }}</span>
+                  <button type="button" class="sort-btn" (click)="toggleSort(c.key)">
+                    {{ c.label }}
+                    <span aria-hidden="true" class="arrows" [class.on]="sortKey() === c.key">{{
+                      sortKey() === c.key ? (sortDir() === 'asc' ? '▲' : '▼') : '▲▼'
+                    }}</span>
+                  </button>
+                } @else {
+                  {{ c.label }}
                 }
               </th>
             }
@@ -69,7 +71,15 @@ export type TableRow = Record<string, string>;
       color: var(--color-text-secondary);
       white-space: nowrap;
     }
-    th.sortable { cursor: pointer; }
+    .sort-btn {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      font: inherit;
+      color: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
     .arrows { margin-left: 4px; font-size: 10px; color: var(--color-text-muted); }
     .arrows.on { color: var(--color-primary); }
     td { padding: var(--table-py) var(--table-px); border-bottom: var(--border-subtle); line-height: 1.5; }

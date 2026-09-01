@@ -82,7 +82,7 @@ test('comparisons land in history: profile modules and picker chips', async ({ p
 test('groups land in history and reopen from profile', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/groups?users=alice,bob');
-  await expect(page.getByRole('columnheader', { name: 'alice' })).toBeVisible();
+  await expect(page.locator('hk-comparison-table').getByRole('columnheader', { name: 'alice' })).toBeVisible();
 
   await page.goto('/profile');
   const groupsModule = page.locator('.recents').nth(1);

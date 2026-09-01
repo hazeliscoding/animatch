@@ -6,6 +6,7 @@ import { bestGenre, genreStatsOf, predictedScore } from './backlog-engine';
 import { completedOf } from './comparison-engine';
 
 export interface RecommendationView {
+  mediaId: number;
   title: string;
   meta: string;
   genres: string;
@@ -41,6 +42,7 @@ export function buildRecommendations(
           ? `Loved site-wide · ${c.averageScore}/100`
           : 'Popular with AniList users';
       return {
+        mediaId: c.id,
         title: c.title,
         meta: [c.format ?? '—', c.year != null ? String(c.year) : '—', c.episodes != null ? `${c.episodes} ep` : null]
           .filter(Boolean)

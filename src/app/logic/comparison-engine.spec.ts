@@ -85,9 +85,9 @@ describe('histogram', () => {
     ];
     const bins = histogram(entries);
     expect(bins).toHaveLength(10);
-    expect(bins[7]).toEqual({ bin: 8, px: 60 });
-    expect(bins[9]).toEqual({ bin: 10, px: 30 });
-    expect(bins[0]).toEqual({ bin: 1, px: 0 });
+    expect(bins[7]).toEqual({ bin: 8, px: 60, count: 2 });
+    expect(bins[9]).toEqual({ bin: 10, px: 30, count: 1 });
+    expect(bins[0]).toEqual({ bin: 1, px: 0, count: 0 });
   });
 });
 

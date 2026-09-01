@@ -40,7 +40,7 @@ test('comparing two users renders live data (AniList mocked)', async ({ page }) 
   await expect(disagreements).toContainText('Anime Two');
   await expect(disagreements).toContainText('Δ 5.0');
   // 2 titles scored by both users
-  await expect(page.getByText('All 2 →')).toBeVisible();
+  await expect(page.getByText('All 2', { exact: true })).toBeVisible();
   await expect(page).toHaveURL(/a=alice&b=bob/);
 });
 

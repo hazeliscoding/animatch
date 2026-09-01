@@ -1,6 +1,7 @@
 // App shell navigation data.
 
-export const UTIL_LEFT = ['Help', 'What is AniMatch?'];
+// Left side intentionally empty until Help content exists — no dead links.
+export const UTIL_LEFT: string[] = [];
 
 export const NAV_ITEMS = [
   { label: 'Compare', path: '/compare' },

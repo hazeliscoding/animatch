@@ -33,7 +33,7 @@ export class App {
           { label: this.viewer() ? `Signed in as ${this.viewer()!.name}` : 'My profile', action: 'profile' },
           { label: 'Log out', action: 'logout' },
         ]
-      : [{ label: 'Connect AniList', action: 'connect' }, { label: 'Sign in', action: 'connect' }],
+      : [{ label: 'Connect AniList', action: 'connect' }],
   );
 
   readonly searchResults = signal<AnilistUserHit[]>([]);
@@ -63,6 +63,7 @@ export class App {
     { label: 'Compare', glyph: '⇄', path: '/compare' },
     { label: 'Backlog', glyph: '≡', path: '/backlog' },
     { label: 'Groups', glyph: '⌂', path: '/groups' },
+    { label: 'Recs', glyph: '★', path: '/recommendations' },
     { label: 'Profile', glyph: '○', path: '/profile' },
   ];
 
@@ -141,5 +142,32 @@ export class App {
     if (!this.searchOpen()) return;
     const target = event.target as HTMLElement | null;
     if (!target?.closest('.search-wrap')) this.searchOpen.set(false);
+  }
+
+  /** Keyboard support for the search dropdown: arrows rove, Escape closes. */
+  onSearchKeydown(event: KeyboardEvent) {
+    const wrap = event.currentTarget as HTMLElement;
+    if (event.key === 'Escape') {
+      this.searchOpen.set(false);
+      wrap.querySelector('input')?.focus();
+      return;
+    }
+    if (!this.searchOpen() || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) return;
+    event.preventDefault();
+    const options = [...wrap.querySelectorAll<HTMLButtonElement>('.result:not(.none)')];
+    if (!options.length) return;
+    const current = options.indexOf(document.activeElement as HTMLButtonElement);
+    if (event.key === 'ArrowDown') {
+      options[Math.min(current + 1, options.length - 1)].focus();
+    } else if (current <= 0) {
+      wrap.querySelector('input')?.focus();
+    } else {
+      options[current - 1].focus();
+    }
+  }
+
+  onSearchFocusout(event: FocusEvent) {
+    const wrap = event.currentTarget as HTMLElement;
+    if (!wrap.contains(event.relatedTarget as Node | null)) this.searchOpen.set(false);
   }
 }

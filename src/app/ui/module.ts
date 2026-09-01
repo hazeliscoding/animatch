@@ -9,14 +9,14 @@ export type ModuleAccent = 'bar' | 'tint' | 'none';
       <header class="head" [class.tint]="accent() === 'tint'" [class.bar]="accent() === 'bar'">
         <h2 class="title">{{ title() }}</h2>
         @if (action(); as a) {
-          <span class="action"><a href="#" (click)="$event.preventDefault()">{{ a }} →</a></span>
+          <span class="action">{{ a }}</span>
         }
       </header>
       <div class="body" [class.pad]="pad()">
         <ng-content />
       </div>
       @if (footer(); as f) {
-        <footer class="foot"><a href="#" (click)="$event.preventDefault()">{{ f }} →</a></footer>
+        <footer class="foot">{{ f }}</footer>
       }
     </section>
   `,
@@ -39,7 +39,7 @@ export type ModuleAccent = 'bar' | 'tint' | 'none';
     .head.bar { border-left: 3px solid var(--color-primary); }
     .head.tint { background: var(--color-primary-subtle); }
     .title { font-size: var(--text-md); font-weight: 700; }
-    .action { font-size: var(--text-xs); white-space: nowrap; }
+    .action { font-size: var(--text-xs); white-space: nowrap; color: var(--color-text-secondary); }
     .body.pad { padding: var(--module-pad); }
     .foot {
       padding: 6px var(--module-pad);

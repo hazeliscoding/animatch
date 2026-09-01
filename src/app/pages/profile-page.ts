@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AnilistService } from '../api/anilist.service';
 import { AuthService } from '../api/auth.service';
 import { HistoryStore, relativeTime } from '../api/history-store';
+import { HistBin, histSummary } from '../logic/comparison-engine';
 import { ProfileView, buildProfile } from '../logic/profile-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
@@ -38,9 +39,13 @@ export class ProfilePage {
 
   readonly crumbs = computed(() => [
     { label: 'Home', path: '/' },
-    { label: 'My profile' },
+    { label: this.profile() && !this.isSelf() ? 'Profiles' : 'My profile' },
     ...(this.profile() ? [{ label: this.profile()!.name }] : []),
   ]);
+
+  histLabel(bins: HistBin[], name: string): string {
+    return histSummary(bins, name);
+  }
 
   readonly rel = relativeTime;
 

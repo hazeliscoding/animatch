@@ -27,8 +27,11 @@
           {{ loading() ? 'Loading lists…' : 'Compare' }}
         </hk-button>
       </div>
+      <span class="hk-visually-hidden" aria-live="polite">{{ loading() ? 'Loading lists from AniList…' : '' }}</span>
       @if (error(); as err) {
         <div class="picker-error" role="alert">{{ err }}</div>
+      } @else if (!live() && nameA && !nameB) {
+        <div class="picker-note">Now add a second username to compare with <strong>{{ nameA }}</strong>.</div>
       } @else if (!live()) {
         <div class="picker-note">
           Any two public profiles work —
@@ -51,6 +54,7 @@
   }
 
   @if (view(); as v) {
+    <h1 class="hk-visually-hidden">{{ v.userA.name }} × {{ v.userB.name }} — taste match {{ v.compatScore }} out of 100</h1>
     <!-- Desktop duo panel -->
     <div class="duo-panel desktop-only">
       <div class="user">
@@ -85,6 +89,7 @@
           <div class="score-label">Taste match</div>
           <div class="score">{{ v.compatScore }}<span class="score-max">/100</span></div>
           <div class="score-bar"><div class="fill" [style.width.%]="v.compatScore"></div></div>
+          <div class="score-hint">{{ scoreHint(v.compatScore) }}</div>
         </div>
         <hk-button variant="secondary" size="sm" (click)="editing.set(!editing())">Change user</hk-button>
       </div>
@@ -111,7 +116,7 @@
       </div>
       <div class="score-row">
         <span class="score-big">{{ v.compatScore }}</span>
-        <span class="score-note">/100 taste match</span>
+        <span class="score-note">/100 taste match · {{ scoreHint(v.compatScore) }}</span>
       </div>
       <div class="score-bar"><div class="fill" [style.width.%]="v.compatScore"></div></div>
     </div>
@@ -156,7 +161,7 @@
                   }
                 </div>
                 <div class="dis-main">
-                  <a href="#" (click)="$event.preventDefault()" class="dis-title">{{ d.title }}</a>
+                  <a [href]="'https://anilist.co/anime/' + d.mediaId" target="_blank" rel="noopener" class="dis-title">{{ d.title }}</a>
                   <div class="dis-meta">{{ d.meta }}</div>
                 </div>
                 <div class="dis-scores">
@@ -175,7 +180,7 @@
             @for (d of v.disagreements.slice(0, 3); track d.title) {
               <div class="dis-row compact">
                 <div class="dis-main">
-                  <a href="#" (click)="$event.preventDefault()" class="dis-title sm">{{ d.title }}</a>
+                  <a [href]="'https://anilist.co/anime/' + d.mediaId" target="_blank" rel="noopener" class="dis-title sm">{{ d.title }}</a>
                 </div>
                 <span class="sc-a sm">{{ d.a }}</span>
                 <span class="sc-vs">vs</span>
@@ -186,9 +191,9 @@
           </div>
         </hk-module>
 
-        <hk-module title="Score distribution" [pad]="true" class="desktop-only">
+        <hk-module title="Score distribution" [pad]="true">
           <div class="hists">
-            <div>
+            <div role="img" [attr.aria-label]="histLabel(v.histA, v.userA.name)">
               <div class="hist-title a">{{ v.userA.name }}</div>
               <div class="hist-bars">
                 @for (h of v.histA; track h.bin) {
@@ -201,7 +206,7 @@
                 }
               </div>
             </div>
-            <div>
+            <div role="img" [attr.aria-label]="histLabel(v.histB, v.userB.name)">
               <div class="hist-title b">{{ v.userB.name }}</div>
               <div class="hist-bars">
                 @for (h of v.histB; track h.bin) {
@@ -218,7 +223,7 @@
         </hk-module>
       </div>
 
-      <div class="col hk-stack desktop-only">
+      <div class="col hk-stack">
         <hk-module title="Shared anime · both scored" [action]="'All ' + v.sharedTotal">
           <hk-data-table [columns]="sharedCols()" [rows]="v.sharedRows" [footer]="v.sharedFooter" />
         </hk-module>
@@ -228,20 +233,18 @@
             <span class="key"><span class="swatch a"></span>{{ v.userA.name }}</span>
             <span class="key"><span class="swatch b"></span>{{ v.userB.name }}</span>
             <span class="legend-note">% of each user's completed list</span>
-            <span class="view-toggle" role="tablist" aria-label="Genre profile view">
+            <span class="view-toggle">
               <button
                 type="button"
-                role="tab"
-                [attr.aria-selected]="genreView() === 'bars'"
+                [attr.aria-pressed]="genreView() === 'bars'"
                 class="vt"
                 [class.sel]="genreView() === 'bars'"
                 (click)="genreView.set('bars')"
               >Bars</button>
-              <span class="vt-sep">|</span>
+              <span class="vt-sep" aria-hidden="true">|</span>
               <button
                 type="button"
-                role="tab"
-                [attr.aria-selected]="genreView() === 'radar'"
+                [attr.aria-pressed]="genreView() === 'radar'"
                 class="vt"
                 [class.sel]="genreView() === 'radar'"
                 (click)="genreView.set('radar')"

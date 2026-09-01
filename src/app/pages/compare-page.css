@@ -26,7 +26,7 @@
   min-width: 0;
   width: 180px;
 }
-.picker-input:focus { border-color: var(--color-primary); outline: none; }
+.picker-input:focus { border-color: var(--color-primary); }
 .picker-error {
   font-size: 12px;
   font-weight: 700;
@@ -118,6 +118,7 @@
   margin-top: 4px;
 }
 .score-bar .fill { height: 100%; background: var(--color-primary); }
+.score-hint { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
 
 /* ---- mobile summary (1d) ---- */
 .mobile-summary {

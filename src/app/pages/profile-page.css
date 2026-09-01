@@ -33,7 +33,7 @@
   width: 180px;
 }
 .picker-input.wide { width: 320px; }
-.picker-input:focus { border-color: var(--color-primary); outline: none; }
+.picker-input:focus { border-color: var(--color-primary); }
 .picker-error {
   font-size: 12px;
   font-weight: 700;

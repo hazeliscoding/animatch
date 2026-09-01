@@ -21,7 +21,7 @@ Compare anime taste between [AniList](https://anilist.co) users. One place that 
 
 - **Angular 22** — standalone components, signals, typed routes.
 - **Hikari design system** — an information-dense, portal-style design language ported as CSS tokens (`src/styles/tokens/`) and reusable components (`src/app/ui/`).
-- Currently runs on mock data (`src/app/data/animatch-data.ts`) — AniList GraphQL integration is next, see [ROADMAP.md](ROADMAP.md).
+- **AniList GraphQL** — public API, no auth: full lists (completed, planning, watching), user search, avatars, and cover art. Compare via `/compare?a=<user>&b=<user>`, groups via `/groups?users=<a,b,c>`; the design mockup's data shows as a demo until real users are loaded. See [ROADMAP.md](ROADMAP.md) for what's next.
 
 ## 🚀 Getting started
 

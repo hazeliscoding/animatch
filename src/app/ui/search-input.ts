@@ -10,6 +10,8 @@ import { Component, input, output } from '@angular/core';
         [placeholder]="placeholder()"
         [attr.aria-label]="placeholder()"
         class="input"
+        (input)="query.emit(q.value)"
+        (keydown.escape)="q.value = ''; query.emit('')"
       />
       <button type="submit" class="submit">{{ buttonLabel() }}</button>
     </form>
@@ -47,6 +49,8 @@ export class HkSearchInput {
   readonly buttonLabel = input('Search');
   readonly size = input<'md' | 'lg'>('md');
   readonly search = output<string>();
+  /** Emits on every keystroke (typeahead); empty string on Escape. */
+  readonly query = output<string>();
 
   onSubmit(e: Event) {
     e.preventDefault();

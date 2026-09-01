@@ -1,7 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
+import { AnilistService, AnilistUserHit } from './api/anilist.service';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
 import { HkSearchInput } from './ui/search-input';
@@ -13,13 +14,20 @@ import { NAV_ITEMS, UTIL_LEFT, UTIL_RIGHT } from './data/animatch-data';
   imports: [RouterOutlet, RouterLink, RouterLinkActive, HkGlobalHeader, HkGlobalNav, HkSearchInput, HkUtilityBar],
   templateUrl: './app.html',
   styleUrl: './app.css',
+  host: { '(document:click)': 'onDocumentClick($event)' },
 })
 export class App {
   private readonly router = inject(Router);
+  private readonly anilist = inject(AnilistService);
 
   readonly utilLeft = UTIL_LEFT;
   readonly utilRight = UTIL_RIGHT;
   readonly navItems = NAV_ITEMS;
+
+  readonly searchResults = signal<AnilistUserHit[]>([]);
+  readonly searchOpen = signal(false);
+  private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private searchSeq = 0;
 
   private readonly url = toSignal(
     this.router.events.pipe(
@@ -42,4 +50,57 @@ export class App {
     { label: 'Groups', glyph: '⌂', path: '/groups' },
     { label: 'Profile', glyph: '○', path: null },
   ];
+
+  onSearchQuery(q: string) {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    const query = q.trim();
+    if (query.length < 2) {
+      this.searchSeq++;
+      this.searchOpen.set(false);
+      this.searchResults.set([]);
+      return;
+    }
+    this.searchTimer = setTimeout(() => void this.runSearch(query), 300);
+  }
+
+  onSearchSubmit(q: string) {
+    if (this.searchTimer) clearTimeout(this.searchTimer);
+    const query = q.trim();
+    if (query.length >= 2) void this.runSearch(query);
+  }
+
+  private async runSearch(query: string) {
+    const seq = ++this.searchSeq;
+    try {
+      const hits = await this.anilist.searchUsers(query);
+      if (seq !== this.searchSeq) return;
+      this.searchResults.set(hits);
+      this.searchOpen.set(true);
+    } catch {
+      // network hiccup — keep the dropdown closed rather than surface an error here
+      if (seq === this.searchSeq) this.searchOpen.set(false);
+    }
+  }
+
+  pickUser(name: string) {
+    this.searchOpen.set(false);
+    const params = this.router.parseUrl(this.router.url).queryParams;
+    let a = params['a'] as string | undefined;
+    let b = params['b'] as string | undefined;
+    if (!a) {
+      a = name;
+    } else if (!b && a.toLowerCase() !== name.toLowerCase()) {
+      b = name;
+    } else {
+      a = name;
+      b = undefined;
+    }
+    void this.router.navigate(['/compare'], { queryParams: { a, b: b ?? null } });
+  }
+
+  onDocumentClick(event: Event) {
+    if (!this.searchOpen()) return;
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.search-wrap')) this.searchOpen.set(false);
+  }
 }

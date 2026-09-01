@@ -3,7 +3,30 @@
   <div class="desktop-only">
     <hk-utility-bar [left]="utilLeft" [right]="utilRight" />
     <hk-global-header brand="AniMatch" tagline="for AniList">
-      <hk-search-input placeholder="Search a user or anime title" />
+      <div class="search-wrap">
+        <hk-search-input
+          placeholder="Search AniList users"
+          (query)="onSearchQuery($event)"
+          (search)="onSearchSubmit($event)"
+        />
+        @if (searchOpen()) {
+          <div class="search-results" role="listbox">
+            @for (u of searchResults(); track u.id) {
+              <button type="button" role="option" class="result" (click)="pickUser(u.name)">
+                @if (u.avatar) {
+                  <img [src]="u.avatar" alt="" class="r-avatar" />
+                } @else {
+                  <span class="r-avatar ph">{{ u.name.charAt(0).toUpperCase() }}</span>
+                }
+                <span class="r-name">{{ u.name }}</span>
+                <span class="r-meta">{{ u.completed }} anime</span>
+              </button>
+            } @empty {
+              <div class="result none">No users found</div>
+            }
+          </div>
+        }
+      </div>
     </hk-global-header>
     <hk-global-nav [items]="navItems" [active]="activeNav()" />
   </div>

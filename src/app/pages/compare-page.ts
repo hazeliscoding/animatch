@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PairStore } from '../api/pair-store';
@@ -43,14 +44,26 @@ export class ComparePage {
   ]);
 
   constructor() {
-    const qp = this.route.snapshot.queryParamMap;
-    const a = qp.get('a');
-    const b = qp.get('b');
-    if (a && b) {
-      this.nameA = a;
-      this.nameB = b;
-      void this.compare();
-    }
+    // React to param changes too — the header user search navigates to
+    // /compare with new params while this page may already be active.
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((qp) => {
+      const a = qp.get('a');
+      const b = qp.get('b');
+      if (a && b) {
+        const alreadyLoaded =
+          this.live() &&
+          this.view().userA.name.toLowerCase() === a.toLowerCase() &&
+          this.view().userB.name.toLowerCase() === b.toLowerCase();
+        if (!alreadyLoaded) {
+          this.nameA = a;
+          this.nameB = b;
+          void this.compare();
+        }
+      } else if (a) {
+        this.nameA = a;
+        this.editing.set(true);
+      }
+    });
   }
 
   showPicker() {

@@ -8,6 +8,7 @@ import { RouterLink } from '@angular/router';
     <header class="header">
       <div class="inner">
         <a routerLink="/" class="brand hk-link-quiet">
+          <span class="logo-mark" aria-hidden="true">AM</span>
           <span class="wordmark">{{ brand() }}</span>
           @if (tagline(); as t) {
             <span class="tagline">{{ t }}</span>
@@ -27,7 +28,23 @@ import { RouterLink } from '@angular/router';
       align-items: center;
       gap: 20px;
     }
-    .brand { display: flex; align-items: baseline; gap: 6px; text-decoration: none; white-space: nowrap; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap; }
+    .logo-mark {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      background: var(--color-primary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      flex: none;
+    }
+    .tagline { align-self: flex-end; margin-bottom: 3px; }
     .wordmark {
       font-size: 24px;
       font-weight: 700;

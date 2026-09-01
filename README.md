@@ -1,3 +1,5 @@
+<p align="center"><img src="public/icon-192.png" width="96" alt="AniMatch logo"></p>
+
 <h1 align="center">AniMatch</h1>
 
 Compare anime taste between [AniList](https://anilist.co) users. One place that answers: **how compatible are we, where do we disagree, and what should we watch together?**

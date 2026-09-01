@@ -16,3 +16,6 @@ export const ANILIST_CLIENT_ID = '49943';
 /** Well-known public profiles used for "try it live" sample links. */
 export const SAMPLE_PAIR = { a: 'Anime', b: 'Kira' };
 export const SAMPLE_GROUP = ['Anime', 'Kira', 'akirakira', 'yuki'];
+
+/** Canonical production origin (no trailing slash) — used for SEO/OG tags and the sitemap. */
+export const SITE_URL = 'https://animatch-hazels-projects-ebc086d4.vercel.app';

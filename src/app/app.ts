@@ -4,6 +4,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { AnilistService, AnilistUserHit } from './api/anilist.service';
 import { AuthService } from './api/auth.service';
+import { SeoService } from './seo.service';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
 import { HkSearchInput } from './ui/search-input';
@@ -68,6 +69,7 @@ export class App {
   ];
 
   constructor() {
+    inject(SeoService).init();
     effect(() => {
       const token = this.auth.token();
       if (!token) {

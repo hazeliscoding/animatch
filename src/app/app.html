@@ -36,7 +36,10 @@
   <!-- Mobile chrome -->
   <div class="mobile-only">
     <div class="mobile-header">
-      <a routerLink="/" class="m-brand">AniMatch</a>
+      <a routerLink="/" class="m-brand">
+        <span class="logo-mark" aria-hidden="true">AM</span>
+        AniMatch
+      </a>
       <span class="m-tagline">for AniList</span>
       @if (auth.connected()) {
         <a routerLink="/profile" class="m-signin">{{ viewer()?.name ?? 'Profile' }}</a>

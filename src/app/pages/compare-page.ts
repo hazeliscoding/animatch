@@ -76,9 +76,17 @@ export class ComparePage {
     const v = this.view();
     if (!v) return;
     const url = window.location.href;
+    let blob: Blob;
     try {
-      const { blob, filename } = await this.makeCard();
-      const file = new File([blob], filename, { type: 'image/png' });
+      blob = (await this.makeCard()).blob;
+    } catch {
+      await this.copyLink();
+      return;
+    }
+
+    // 1. native share sheet with the image (mobile, macOS Safari)
+    try {
+      const file = new File([blob], `animatch-${v.userA.name}-x-${v.userB.name}.png`, { type: 'image/png' });
       const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
       if (nav.share && nav.canShare?.({ files: [file] })) {
         await nav.share({
@@ -88,11 +96,30 @@ export class ComparePage {
         });
         return;
       }
-    } catch {
-      // fall through to the link fallback (user may also have dismissed the sheet)
+    } catch (e) {
+      // user dismissed the sheet — do nothing further
+      if (e instanceof DOMException && e.name === 'AbortError') return;
     }
+
+    // 2. desktop: put the card image itself on the clipboard so it pastes
     try {
-      await navigator.clipboard.writeText(url);
+      const ClipboardItemCtor = (window as { ClipboardItem?: typeof ClipboardItem }).ClipboardItem;
+      if (ClipboardItemCtor && navigator.clipboard?.write) {
+        await navigator.clipboard.write([new ClipboardItemCtor({ 'image/png': blob })]);
+        this.setStatus('Card copied — paste it anywhere');
+        return;
+      }
+    } catch {
+      // clipboard images unsupported here — fall back to the link
+    }
+
+    // 3. last resort: the link as text
+    await this.copyLink();
+  }
+
+  async copyLink() {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
       this.setStatus('Link copied');
     } catch {
       this.setStatus('Could not copy — grab the address bar URL');

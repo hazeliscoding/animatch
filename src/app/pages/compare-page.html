@@ -92,8 +92,9 @@
           <div class="score-hint">{{ scoreHint(v.compatScore) }}</div>
         </div>
         <div class="side-actions">
-          <hk-button variant="primary" size="sm" (click)="share()">Share →</hk-button>
+          <hk-button variant="primary" size="sm" (click)="share()">Share card →</hk-button>
           <hk-button variant="secondary" size="sm" (click)="downloadCard()">Save card</hk-button>
+          <hk-button variant="ghost" size="sm" (click)="copyLink()">Copy link</hk-button>
           <hk-button variant="ghost" size="sm" (click)="editing.set(!editing())">Change user</hk-button>
           <span class="share-status" aria-live="polite">{{ shareStatus() }}</span>
         </div>
@@ -125,8 +126,9 @@
       </div>
       <div class="score-bar"><div class="fill" [style.width.%]="v.compatScore"></div></div>
       <div class="m-share">
-        <hk-button variant="primary" size="sm" (click)="share()">Share →</hk-button>
+        <hk-button variant="primary" size="sm" (click)="share()">Share card →</hk-button>
         <hk-button variant="secondary" size="sm" (click)="downloadCard()">Save card</hk-button>
+        <hk-button variant="ghost" size="sm" (click)="copyLink()">Copy link</hk-button>
         <span class="share-status" aria-live="polite">{{ shareStatus() }}</span>
       </div>
     </div>

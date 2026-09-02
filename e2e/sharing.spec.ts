@@ -15,12 +15,26 @@ const mockAnilist = async (page: import('@playwright/test').Page) => {
 
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
-test('share copies the comparison link when native share is unavailable', async ({ page }) => {
+test('share puts the card image on the clipboard when native share is unavailable', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/compare?a=alice&b=bob');
   await expect(page.locator('.user-name').first()).toHaveText(/alice/);
 
-  await page.getByRole('button', { name: 'Share →' }).click();
+  await page.getByRole('button', { name: 'Share card →' }).click();
+  await expect(page.locator('.share-status').first()).toHaveText('Card copied — paste it anywhere');
+  const clipboardTypes = await page.evaluate(async () => {
+    const items = await navigator.clipboard.read();
+    return items.flatMap((i) => [...i.types]);
+  });
+  expect(clipboardTypes).toContain('image/png');
+});
+
+test('copy link copies the comparison URL', async ({ page }) => {
+  await mockAnilist(page);
+  await page.goto('/compare?a=alice&b=bob');
+  await expect(page.locator('.user-name').first()).toHaveText(/alice/);
+
+  await page.getByRole('button', { name: 'Copy link' }).click();
   await expect(page.locator('.share-status').first()).toHaveText('Link copied');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain('/compare?a=alice&b=bob');

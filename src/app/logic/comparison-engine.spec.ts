@@ -112,8 +112,7 @@ describe('buildComparison', () => {
     expect(view.breakdown[2].note).toBe('2 of 4 unique titles');
   });
 
-  it('never lists agreements as disagreements', () => {
-    // identical scores on every shared title -> no disagreements at all
+  it('never lists identical scores as disagreements, and flags mild gaps', () => {
     const twinA = list('roze', [
       entry({ mediaId: 1, score: 10 }),
       entry({ mediaId: 2, score: 8.5 }),
@@ -125,8 +124,14 @@ describe('buildComparison', () => {
       entry({ mediaId: 3, score: 9 }),
     ]);
     const view = buildComparison(twinA, twinB);
-    expect(view.disagreements).toEqual([]);
+    // the 10-vs-10 and 9-vs-9 agreements never appear; the 0.5 gap does, as mild
+    expect(view.disagreements).toHaveLength(1);
+    expect(view.disagreements[0]).toMatchObject({ diff: '0.5', major: false });
     expect(view.disagreementTotal).toBe(0);
+
+    // fully identical lists -> truly empty
+    const same = buildComparison(twinA, twinA);
+    expect(same.disagreements).toEqual([]);
   });
 
   it('ranks disagreements by absolute delta descending', () => {

@@ -39,6 +39,8 @@ export interface DisagreementView {
   a: string;
   b: string;
   diff: string;
+  /** true for gaps >= 2 points — styled as a real clash, not a mild difference */
+  major: boolean;
   cover: string | null;
 }
 
@@ -239,10 +241,10 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     { label: 'Studio affinity', note: 'Shared high-rated studios', pct: studioPct, val: `${studioPct}%` },
   ];
 
-  // A "disagreement" needs a real gap — otherwise well-matched pairs see
-  // "10.0 vs 10.0" padding the list.
+  // Any nonzero gap can be listed (identical scores are agreements, not
+  // "10.0 vs 10.0 disagreements"), but only >= 2-point gaps count as major.
   const byDeltaDesc = sharedScored
-    .filter((p) => Math.abs(p.a.score! - p.b.score!) >= 1)
+    .filter((p) => Math.abs(p.a.score! - p.b.score!) > 0)
     .sort((p, q) => Math.abs(q.a.score! - q.b.score!) - Math.abs(p.a.score! - p.b.score!));
   const disagreements: DisagreementView[] = byDeltaDesc.slice(0, 4).map((p) => ({
     mediaId: p.a.mediaId,
@@ -251,6 +253,7 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     a: fmt1(p.a.score!),
     b: fmt1(p.b.score!),
     diff: fmt1(Math.abs(p.a.score! - p.b.score!)),
+    major: Math.abs(p.a.score! - p.b.score!) >= 2,
     cover: p.a.cover,
   }));
 

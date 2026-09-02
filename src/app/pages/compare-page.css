@@ -207,6 +207,7 @@
   color: var(--red-700);
 }
 .delta.sm { font-size: 10px; padding: 2px 5px; }
+.delta.mild { background: var(--color-surface-sunken); color: var(--color-text-secondary); }
 
 /* ---- score distribution ---- */
 .hists { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }

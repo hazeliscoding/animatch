@@ -173,11 +173,11 @@
                   <span class="sc-vs">vs</span>
                   <span class="sc-b">{{ d.b }}</span>
                 </div>
-                <span class="delta">Δ {{ d.diff }}</span>
+                <span class="delta" [class.mild]="!d.major">Δ {{ d.diff }}</span>
               </div>
             } @empty {
               <div class="dis-empty">
-                No title sits more than a point apart — you two basically agree on everything.
+                Identical scores on every shared title — you two agree on everything.
               </div>
             }
           </div>
@@ -197,11 +197,11 @@
                 <span class="sc-a sm">{{ d.a }}</span>
                 <span class="sc-vs">vs</span>
                 <span class="sc-b sm">{{ d.b }}</span>
-                <span class="delta sm">Δ {{ d.diff }}</span>
+                <span class="delta sm" [class.mild]="!d.major">Δ {{ d.diff }}</span>
               </div>
             } @empty {
               <div class="dis-empty">
-                No title sits more than a point apart — you two basically agree on everything.
+                Identical scores on every shared title — you two agree on everything.
               </div>
             }
           </div>

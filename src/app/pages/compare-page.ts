@@ -76,36 +76,39 @@ export class ComparePage {
     const v = this.view();
     if (!v) return;
     const url = window.location.href;
-    let blob: Blob;
-    try {
-      blob = (await this.makeCard()).blob;
-    } catch {
-      await this.copyLink();
-      return;
-    }
 
-    // 1. native share sheet with the image (mobile, macOS Safari)
-    try {
-      const file = new File([blob], `animatch-${v.userA.name}-x-${v.userB.name}.png`, { type: 'image/png' });
-      const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
-      if (nav.share && nav.canShare?.({ files: [file] })) {
-        await nav.share({
-          files: [file],
-          title: `AniMatch: ${v.userA.name} × ${v.userB.name} — ${v.compatScore}/100`,
-          url,
-        });
-        return;
+    // Touch devices: the native share sheet is the right home for the image.
+    // Desktop Chrome/Edge also implement navigator.share (the Windows flyout),
+    // but there "share" means "paste it into chat" — copy the image instead.
+    const touch = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+    if (touch) {
+      try {
+        const { blob, filename } = await this.makeCard();
+        const file = new File([blob], filename, { type: 'image/png' });
+        const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+        if (nav.share && nav.canShare?.({ files: [file] })) {
+          await nav.share({
+            files: [file],
+            title: `AniMatch: ${v.userA.name} × ${v.userB.name} — ${v.compatScore}/100`,
+            url,
+          });
+          return;
+        }
+      } catch (e) {
+        // user dismissed the sheet — do nothing further
+        if (e instanceof DOMException && e.name === 'AbortError') return;
       }
-    } catch (e) {
-      // user dismissed the sheet — do nothing further
-      if (e instanceof DOMException && e.name === 'AbortError') return;
     }
 
-    // 2. desktop: put the card image itself on the clipboard so it pastes
+    // Copy the card image itself so Ctrl+V pastes it. The ClipboardItem gets a
+    // Promise payload so clipboard.write is issued inside the click gesture —
+    // awaiting the (slow) render first can outlive the activation window.
     try {
       const ClipboardItemCtor = (window as { ClipboardItem?: typeof ClipboardItem }).ClipboardItem;
       if (ClipboardItemCtor && navigator.clipboard?.write) {
-        await navigator.clipboard.write([new ClipboardItemCtor({ 'image/png': blob })]);
+        await navigator.clipboard.write([
+          new ClipboardItemCtor({ 'image/png': this.makeCard().then((c) => c.blob) }),
+        ]);
         this.setStatus('Card copied — paste it anywhere');
         return;
       }
@@ -113,7 +116,7 @@ export class ComparePage {
       // clipboard images unsupported here — fall back to the link
     }
 
-    // 3. last resort: the link as text
+    // last resort: the link as text
     await this.copyLink();
   }
 

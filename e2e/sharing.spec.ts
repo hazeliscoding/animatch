@@ -29,6 +29,31 @@ test('share puts the card image on the clipboard when native share is unavailabl
   expect(clipboardTypes).toContain('image/png');
 });
 
+test('desktop ignores the OS share flyout even when navigator.share exists', async ({ page }) => {
+  // Chrome/Edge on Windows implement navigator.share with files; the reported
+  // bug was that this path hijacked Share and nothing reached the clipboard.
+  await page.addInitScript(() => {
+    (navigator as unknown as Record<string, unknown>)['share'] = () => {
+      (window as unknown as Record<string, unknown>)['__shareCalled'] = true;
+      return Promise.resolve();
+    };
+    (navigator as unknown as Record<string, unknown>)['canShare'] = () => true;
+  });
+  await mockAnilist(page);
+  await page.goto('/compare?a=alice&b=bob');
+  await expect(page.locator('.user-name').first()).toHaveText(/alice/);
+
+  await page.getByRole('button', { name: 'Share card →' }).click();
+  await expect(page.locator('.share-status').first()).toHaveText('Card copied — paste it anywhere');
+  const shareCalled = await page.evaluate(() => (window as unknown as Record<string, unknown>)['__shareCalled'] ?? false);
+  expect(shareCalled).toBe(false);
+  const clipboardTypes = await page.evaluate(async () => {
+    const items = await navigator.clipboard.read();
+    return items.flatMap((i) => [...i.types]);
+  });
+  expect(clipboardTypes).toContain('image/png');
+});
+
 test('copy link copies the comparison URL', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/compare?a=alice&b=bob');

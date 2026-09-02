@@ -1,7 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_PAIR } from '../anilist.config';
+import { AuthService } from '../api/auth.service';
 import { PairStore } from '../api/pair-store';
 import {
   BacklogSort,
@@ -25,6 +26,7 @@ const VISIBLE_LIMIT = 8;
 })
 export class BacklogPage {
   private readonly pairStore = inject(PairStore);
+  private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
@@ -36,8 +38,8 @@ export class BacklogPage {
   readonly showAll = signal(false);
   readonly sorts: BacklogSort[] = ['Predicted score', 'Popularity', 'Year'];
 
-  nameA = '';
-  nameB = '';
+  readonly nameA = signal('');
+  readonly nameB = signal('');
   readonly samplePair = SAMPLE_PAIR;
 
   readonly live = computed(() => this.view() !== null);
@@ -82,26 +84,30 @@ export class BacklogPage {
   readonly fmt = fmtPredicted;
 
   constructor() {
+    effect(() => {
+      const viewer = this.auth.viewer();
+      if (viewer && !this.nameA() && !this.live()) this.nameA.set(viewer.name);
+    });
     const qp = this.route.snapshot.queryParamMap;
     const a = qp.get('a');
     const b = qp.get('b');
     if (a && b) {
-      this.nameA = a;
-      this.nameB = b;
+      this.nameA.set(a);
+      this.nameB.set(b);
       void this.load();
     }
   }
 
   loadSample() {
-    this.nameA = SAMPLE_PAIR.a;
-    this.nameB = SAMPLE_PAIR.b;
+    this.nameA.set(SAMPLE_PAIR.a);
+    this.nameB.set(SAMPLE_PAIR.b);
     void this.load();
   }
 
   async load() {
     if (this.loading()) return;
-    const a = this.nameA.trim();
-    const b = this.nameB.trim();
+    const a = this.nameA().trim();
+    const b = this.nameB().trim();
     if (!a || !b) {
       this.error.set('Enter two AniList usernames.');
       return;

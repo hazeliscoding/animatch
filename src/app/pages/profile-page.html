@@ -85,9 +85,23 @@
         </div>
       </div>
       <div class="card-actions">
-        <hk-button variant="primary" size="sm" [routerLink]="'/compare'" [queryParams]="{ a: p.name }">
-          Compare {{ p.name }} with…
-        </hk-button>
+        @if (compareWithMe(); as me) {
+          <hk-button
+            variant="primary"
+            size="sm"
+            [routerLink]="'/compare'"
+            [queryParams]="{ a: me, b: p.name }"
+          >
+            Compare with me →
+          </hk-button>
+          <hk-button variant="secondary" size="sm" [routerLink]="'/compare'" [queryParams]="{ a: p.name }">
+            Compare {{ p.name }} with…
+          </hk-button>
+        } @else {
+          <hk-button variant="primary" size="sm" [routerLink]="'/compare'" [queryParams]="{ a: p.name }">
+            Compare {{ p.name }} with…
+          </hk-button>
+        }
         @if (isSelf()) {
           <hk-button variant="ghost" size="sm" (click)="logout()">Log out</hk-button>
         }

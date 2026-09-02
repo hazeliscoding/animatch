@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { SAMPLE_PAIR } from '../anilist.config';
@@ -16,8 +16,8 @@ export class HomePage {
   readonly auth = inject(AuthService);
   readonly history = inject(HistoryStore);
 
-  nameA = '';
-  nameB = '';
+  readonly nameA = signal('');
+  readonly nameB = signal('');
 
   readonly rel = relativeTime;
   readonly samplePair = SAMPLE_PAIR;
@@ -65,13 +65,13 @@ export class HomePage {
     // When connected, you're probably one half of the comparison.
     effect(() => {
       const viewer = this.auth.viewer();
-      if (viewer && !this.nameA) this.nameA = viewer.name;
+      if (viewer && !this.nameA()) this.nameA.set(viewer.name);
     });
   }
 
   compare() {
-    const a = this.nameA.trim();
-    const b = this.nameB.trim();
+    const a = this.nameA().trim();
+    const b = this.nameB().trim();
     if (!a && !b) return;
     void this.router.navigate(['/compare'], {
       queryParams: { a: a || b, b: a && b ? b : null },

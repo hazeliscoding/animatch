@@ -29,6 +29,9 @@
           (keyup.enter)="addMember()"
         />
         <hk-button variant="secondary" size="sm" [disabled]="loading()" (click)="addMember()">+ Add member</hk-button>
+        @if (canAddMe()) {
+          <hk-button variant="ghost" size="sm" [disabled]="loading()" (click)="addMe()">Add me</hk-button>
+        }
       }
       @if (loading()) {
         <span class="picker-note">Loading lists…</span>

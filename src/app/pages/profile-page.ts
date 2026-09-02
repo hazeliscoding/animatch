@@ -33,9 +33,15 @@ export class ProfilePage {
   clientIdInput = this.auth.clientId();
   readonly origin = window.location.origin;
 
-  readonly isSelf = computed(
-    () => this.profile() !== null && this.profile()!.name === this.viewerName(),
-  );
+  readonly isSelf = computed(() => {
+    const me = this.viewerName() ?? this.auth.viewer()?.name;
+    return this.profile() !== null && !!me && this.profile()!.name.toLowerCase() === me.toLowerCase();
+  });
+
+  readonly compareWithMe = computed(() => {
+    const me = this.auth.viewer()?.name;
+    return me && this.profile() && !this.isSelf() ? me : null;
+  });
 
   readonly crumbs = computed(() => [
     { label: 'Home', path: '/' },

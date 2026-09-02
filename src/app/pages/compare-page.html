@@ -30,8 +30,8 @@
       <span class="hk-visually-hidden" aria-live="polite">{{ loading() ? 'Loading lists from AniList…' : '' }}</span>
       @if (error(); as err) {
         <div class="picker-error" role="alert">{{ err }}</div>
-      } @else if (!live() && nameA && !nameB) {
-        <div class="picker-note">Now add a second username to compare with <strong>{{ nameA }}</strong>.</div>
+      } @else if (!live() && nameA() && !nameB()) {
+        <div class="picker-note">Now add a second username to compare with <strong>{{ nameA() }}</strong>.</div>
       } @else if (!live()) {
         <div class="picker-note">
           Any two public profiles work —
@@ -45,7 +45,7 @@
             <button
               type="button"
               class="recent-chip"
-              (click)="nameA = c.a; nameB = c.b; compare()"
+              (click)="nameA.set(c.a); nameB.set(c.b); compare()"
             >{{ c.a }} × {{ c.b }}</button>
           }
         </div>

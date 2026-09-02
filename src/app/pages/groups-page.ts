@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_GROUP } from '../anilist.config';
 import { AnilistService } from '../api/anilist.service';
+import { AuthService } from '../api/auth.service';
 import { HistoryStore } from '../api/history-store';
 import { GroupView, buildGroup } from '../logic/group-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
@@ -20,6 +21,7 @@ const MAX_MEMBERS = 5;
 })
 export class GroupsPage {
   private readonly anilist = inject(AnilistService);
+  private readonly auth = inject(AuthService);
   private readonly history = inject(HistoryStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -34,6 +36,21 @@ export class GroupsPage {
   readonly live = computed(() => this.view() !== null);
   readonly memberCount = computed(() => this.view()?.users.length ?? this.members().length);
   readonly canAdd = computed(() => this.members().length < MAX_MEMBERS);
+  readonly canAddMe = computed(() => {
+    const viewer = this.auth.viewer();
+    return (
+      !!viewer &&
+      this.canAdd() &&
+      !this.members().some((m) => m.toLowerCase() === viewer.name.toLowerCase())
+    );
+  });
+
+  addMe() {
+    const viewer = this.auth.viewer();
+    if (!viewer) return;
+    this.newMember = viewer.name;
+    this.addMember();
+  }
 
   readonly crumbs = [
     { label: 'Home', path: '/' },

@@ -1,6 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SAMPLE_PAIR } from '../anilist.config';
+import { AuthService } from '../api/auth.service';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HistoryStore } from '../api/history-store';
@@ -21,6 +22,7 @@ import { HkModule } from '../ui/module';
 })
 export class ComparePage {
   private readonly pairStore = inject(PairStore);
+  private readonly auth = inject(AuthService);
   readonly history = inject(HistoryStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -31,8 +33,8 @@ export class ComparePage {
   readonly editing = signal(false);
   readonly genreView = signal<'bars' | 'radar'>('bars');
 
-  nameA = '';
-  nameB = '';
+  readonly nameA = signal('');
+  readonly nameB = signal('');
   readonly samplePair = SAMPLE_PAIR;
 
   readonly live = computed(() => this.view() !== null);
@@ -119,6 +121,11 @@ export class ComparePage {
   ]);
 
   constructor() {
+    // Signed in? You're probably one half of the comparison.
+    effect(() => {
+      const viewer = this.auth.viewer();
+      if (viewer && !this.nameA() && !this.live()) this.nameA.set(viewer.name);
+    });
     // React to param changes too — the header user search navigates to
     // /compare with new params while this page may already be active.
     this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((qp) => {
@@ -130,20 +137,20 @@ export class ComparePage {
           this.view()!.userA.name.toLowerCase() === a.toLowerCase() &&
           this.view()!.userB.name.toLowerCase() === b.toLowerCase();
         if (!alreadyLoaded) {
-          this.nameA = a;
-          this.nameB = b;
+          this.nameA.set(a);
+          this.nameB.set(b);
           void this.compare();
         }
       } else if (a) {
-        this.nameA = a;
+        this.nameA.set(a);
         this.editing.set(true);
       }
     });
   }
 
   loadSample() {
-    this.nameA = SAMPLE_PAIR.a;
-    this.nameB = SAMPLE_PAIR.b;
+    this.nameA.set(SAMPLE_PAIR.a);
+    this.nameB.set(SAMPLE_PAIR.b);
     void this.compare();
   }
 
@@ -153,8 +160,8 @@ export class ComparePage {
 
   async compare() {
     if (this.loading()) return;
-    const a = this.nameA.trim();
-    const b = this.nameB.trim();
+    const a = this.nameA().trim();
+    const b = this.nameB().trim();
     if (!a || !b) {
       this.error.set('Enter two AniList usernames.');
       return;

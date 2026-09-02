@@ -6,6 +6,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HistoryStore } from '../api/history-store';
 import { PairStore } from '../api/pair-store';
 import { ComparisonView, HistBin, buildComparison, histSummary } from '../logic/comparison-engine';
+import { renderShareCard } from '../logic/share-card';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
 import { HkDataTable, TableColumn } from '../ui/data-table';
@@ -52,6 +53,63 @@ export class ComparePage {
     if (score >= 45) return 'Solid overlap';
     if (score >= 25) return 'Some common ground';
     return 'Very different lanes';
+  }
+
+  readonly shareStatus = signal('');
+  private statusTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private setStatus(message: string) {
+    this.shareStatus.set(message);
+    if (this.statusTimer) clearTimeout(this.statusTimer);
+    this.statusTimer = setTimeout(() => this.shareStatus.set(''), 3000);
+  }
+
+  private async makeCard(): Promise<{ blob: Blob; filename: string }> {
+    const v = this.view()!;
+    const blob = await renderShareCard(v, this.scoreHint(v.compatScore));
+    return { blob, filename: `animatch-${v.userA.name}-x-${v.userB.name}.png` };
+  }
+
+  async share() {
+    const v = this.view();
+    if (!v) return;
+    const url = window.location.href;
+    try {
+      const { blob, filename } = await this.makeCard();
+      const file = new File([blob], filename, { type: 'image/png' });
+      const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+      if (nav.share && nav.canShare?.({ files: [file] })) {
+        await nav.share({
+          files: [file],
+          title: `AniMatch: ${v.userA.name} × ${v.userB.name} — ${v.compatScore}/100`,
+          url,
+        });
+        return;
+      }
+    } catch {
+      // fall through to the link fallback (user may also have dismissed the sheet)
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      this.setStatus('Link copied');
+    } catch {
+      this.setStatus('Could not copy — grab the address bar URL');
+    }
+  }
+
+  async downloadCard() {
+    if (!this.view()) return;
+    try {
+      const { blob, filename } = await this.makeCard();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      this.setStatus('Card saved');
+    } catch {
+      this.setStatus('Card rendering failed');
+    }
   }
 
   readonly crumbs = computed(() => [

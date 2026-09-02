@@ -119,6 +119,9 @@
 }
 .score-bar .fill { height: 100%; background: var(--color-primary); }
 .score-hint { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+.side-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.share-status { font-size: 11px; color: var(--color-success); text-align: center; min-height: 14px; }
+.m-share { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
 
 /* ---- mobile summary (1d) ---- */
 .mobile-summary {

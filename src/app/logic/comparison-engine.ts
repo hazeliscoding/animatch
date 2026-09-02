@@ -239,9 +239,11 @@ export function buildComparison(a: AnilistUserList, b: AnilistUserList): Compari
     { label: 'Studio affinity', note: 'Shared high-rated studios', pct: studioPct, val: `${studioPct}%` },
   ];
 
-  const byDeltaDesc = [...sharedScored].sort(
-    (p, q) => Math.abs(q.a.score! - q.b.score!) - Math.abs(p.a.score! - p.b.score!),
-  );
+  // A "disagreement" needs a real gap — otherwise well-matched pairs see
+  // "10.0 vs 10.0" padding the list.
+  const byDeltaDesc = sharedScored
+    .filter((p) => Math.abs(p.a.score! - p.b.score!) >= 1)
+    .sort((p, q) => Math.abs(q.a.score! - q.b.score!) - Math.abs(p.a.score! - p.b.score!));
   const disagreements: DisagreementView[] = byDeltaDesc.slice(0, 4).map((p) => ({
     mediaId: p.a.mediaId,
     title: p.a.title,

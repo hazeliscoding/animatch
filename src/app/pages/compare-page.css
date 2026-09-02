@@ -165,6 +165,7 @@
 
 /* ---- disagreements ---- */
 .dis-list { display: flex; flex-direction: column; }
+.dis-empty { padding: 20px 16px; font-size: 13px; color: var(--color-text-secondary); text-align: center; }
 .dis-row {
   display: flex;
   align-items: center;

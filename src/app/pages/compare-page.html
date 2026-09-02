@@ -149,7 +149,11 @@
           </div>
         </hk-module>
 
-        <hk-module title="Biggest disagreements" [action]="'All ' + v.disagreementTotal" class="desktop-only">
+        <hk-module
+          title="Biggest disagreements"
+          [action]="v.disagreementTotal > 0 ? 'All ' + v.disagreementTotal : undefined"
+          class="desktop-only"
+        >
           <div class="dis-list">
             @for (d of v.disagreements; track d.title) {
               <div class="dis-row">
@@ -171,11 +175,19 @@
                 </div>
                 <span class="delta">Δ {{ d.diff }}</span>
               </div>
+            } @empty {
+              <div class="dis-empty">
+                No title sits more than a point apart — you two basically agree on everything.
+              </div>
             }
           </div>
         </hk-module>
 
-        <hk-module title="Biggest disagreements" [action]="'' + v.disagreementTotal" class="mobile-only">
+        <hk-module
+          title="Biggest disagreements"
+          [action]="v.disagreementTotal > 0 ? '' + v.disagreementTotal : undefined"
+          class="mobile-only"
+        >
           <div class="dis-list">
             @for (d of v.disagreements.slice(0, 3); track d.title) {
               <div class="dis-row compact">
@@ -186,6 +198,10 @@
                 <span class="sc-vs">vs</span>
                 <span class="sc-b sm">{{ d.b }}</span>
                 <span class="delta sm">Δ {{ d.diff }}</span>
+              </div>
+            } @empty {
+              <div class="dis-empty">
+                No title sits more than a point apart — you two basically agree on everything.
               </div>
             }
           </div>

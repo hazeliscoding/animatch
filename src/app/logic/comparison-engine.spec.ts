@@ -112,6 +112,23 @@ describe('buildComparison', () => {
     expect(view.breakdown[2].note).toBe('2 of 4 unique titles');
   });
 
+  it('never lists agreements as disagreements', () => {
+    // identical scores on every shared title -> no disagreements at all
+    const twinA = list('roze', [
+      entry({ mediaId: 1, score: 10 }),
+      entry({ mediaId: 2, score: 8.5 }),
+      entry({ mediaId: 3, score: 9 }),
+    ]);
+    const twinB = list('wren', [
+      entry({ mediaId: 1, score: 10 }),
+      entry({ mediaId: 2, score: 8 }),
+      entry({ mediaId: 3, score: 9 }),
+    ]);
+    const view = buildComparison(twinA, twinB);
+    expect(view.disagreements).toEqual([]);
+    expect(view.disagreementTotal).toBe(0);
+  });
+
   it('ranks disagreements by absolute delta descending', () => {
     const view = buildComparison(a, b);
     expect(view.disagreements[0].diff).toBe('4.0');

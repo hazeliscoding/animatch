@@ -17,7 +17,7 @@
 - [x] Recommendations page (predicted mutual scores over AniList's top ~100 popular/highest-rated; deeper catalog digging later)
 - [x] Radar-style genre spread on the compare page (bars ⇄ radar toggle)
 - [x] Backlog tabs: "Only in one backlog" and "Watching together" populated
-- [ ] Group management: create groups, add/remove members
+- [x] Group management: create named groups, add/remove members, saved locally with stable `?g=` links
 - [ ] Session planner for shared backlogs (episode pacing, sync-up suggestions)
 
 ## Phase 4 — Polish & delivery

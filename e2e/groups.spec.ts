@@ -47,6 +47,34 @@ test('loads a group from ?users= and supports member removal', async ({ page }) 
   await expect(page.getByRole('columnheader', { name: 'alice' })).toHaveCount(0);
 });
 
+test('saves, reopens, renames, and deletes a named group', async ({ page }) => {
+  await mockAnilist(page);
+  await page.goto('/groups?users=alice,bob');
+  await expect(page.locator('hk-comparison-table').getByRole('columnheader', { name: 'alice' })).toBeVisible();
+
+  // save under a name; the URL switches to the stable ?g= id
+  await page.getByLabel('Group name').fill('Movie night');
+  await page.getByRole('button', { name: 'Save group' }).click();
+  await expect(page).toHaveURL(/g=/);
+  await expect(page.getByRole('heading', { name: /Movie night/ })).toBeVisible();
+
+  // reopen from the saved-groups list
+  await page.goto('/groups');
+  await page.getByRole('button', { name: 'Movie night alice, bob' }).click();
+  await expect(page.locator('hk-comparison-table').getByRole('columnheader', { name: 'bob' })).toBeVisible();
+
+  // rename
+  await page.getByLabel('Group name').fill('Anime club');
+  await page.getByRole('button', { name: 'Rename' }).click();
+  await expect(page.getByRole('heading', { name: /Anime club/ })).toBeVisible();
+
+  // delete; the saved list is gone after a fresh visit
+  await page.getByRole('button', { name: 'Delete group' }).click();
+  await page.goto('/groups');
+  await expect(page.getByRole('heading', { name: 'Build a watch club' })).toBeVisible();
+  await expect(page.getByText('Anime club')).toHaveCount(0);
+});
+
 test('unknown member surfaces an error and keeps demo data', async ({ page }) => {
   await mockAnilist(page);
   await page.goto('/groups');

@@ -4,7 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SAMPLE_GROUP } from '../anilist.config';
 import { AnilistService } from '../api/anilist.service';
 import { AuthService } from '../api/auth.service';
-import { HistoryStore } from '../api/history-store';
+import { GroupStore, SavedGroup, defaultGroupName } from '../api/group-store';
+import { HistoryStore, relativeTime } from '../api/history-store';
 import { GroupView, buildGroup } from '../logic/group-engine';
 import { HkBreadcrumbs } from '../ui/breadcrumbs';
 import { HkButton } from '../ui/button';
@@ -25,13 +26,20 @@ export class GroupsPage {
   private readonly history = inject(HistoryStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  readonly store = inject(GroupStore);
 
   readonly view = signal<GroupView | null>(null);
   readonly members = signal<string[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
+  /** The saved group currently open, if any. */
+  readonly active = signal<SavedGroup | null>(null);
 
   newMember = '';
+  groupName = '';
+  editName = '';
+
+  readonly rel = relativeTime;
 
   readonly live = computed(() => this.view() !== null);
   readonly memberCount = computed(() => this.view()?.users.length ?? this.members().length);
@@ -52,14 +60,24 @@ export class GroupsPage {
     this.addMember();
   }
 
-  readonly crumbs = [
+  readonly crumbs = computed(() => [
     { label: 'Home', path: '/' },
     { label: 'Groups', path: '/groups' },
-    { label: 'Watch group' },
-  ];
+    { label: this.active()?.name ?? 'Watch group' },
+  ]);
 
   constructor() {
     const qp = this.route.snapshot.queryParamMap;
+    const groupId = qp.get('g');
+    if (groupId) {
+      const saved = this.store.byId(groupId);
+      if (saved) {
+        this.openSaved(saved);
+      } else {
+        this.error.set('That saved group was not found on this device.');
+      }
+      return;
+    }
     const usersParam = qp.get('users');
     if (usersParam) {
       const names = usersParam
@@ -81,6 +99,7 @@ export class GroupsPage {
   }
 
   loadSample() {
+    this.active.set(null);
     this.members.set([...SAMPLE_GROUP]);
     void this.load();
   }
@@ -104,6 +123,50 @@ export class GroupsPage {
       void this.load();
     } else {
       this.view.set(null);
+      this.persistMembers();
+      this.syncUrl();
+    }
+  }
+
+  saveGroup() {
+    const users = this.members();
+    if (users.length < 2 || this.active()) return;
+    const name = this.groupName.trim() || defaultGroupName(users);
+    const group = this.store.create(name, users);
+    this.active.set(group);
+    this.editName = group.name;
+    this.groupName = '';
+    this.syncUrl();
+  }
+
+  rename() {
+    const group = this.active();
+    const name = this.editName.trim();
+    if (!group || !name || name === group.name) return;
+    this.store.rename(group.id, name);
+    this.active.set({ ...group, name });
+  }
+
+  deleteGroup() {
+    const group = this.active();
+    if (!group) return;
+    this.store.remove(group.id);
+    this.active.set(null);
+    this.syncUrl();
+  }
+
+  openSaved(group: SavedGroup) {
+    this.error.set(null);
+    this.active.set(group);
+    this.editName = group.name;
+    this.members.set([...group.users]);
+    if (group.users.length >= 2) void this.load();
+  }
+
+  deleteSaved(group: SavedGroup) {
+    this.store.remove(group.id);
+    if (this.active()?.id === group.id) {
+      this.active.set(null);
       this.syncUrl();
     }
   }
@@ -122,6 +185,7 @@ export class GroupsPage {
       this.members.set(lists.map((l) => l.name));
       this.view.set(buildGroup(lists));
       this.history.recordGroup(this.members());
+      this.persistMembers();
       this.syncUrl();
     } catch (e) {
       this.error.set(e instanceof Error ? e.message : 'Loading the group failed.');
@@ -130,10 +194,20 @@ export class GroupsPage {
     }
   }
 
+  private persistMembers() {
+    const group = this.active();
+    if (!group) return;
+    this.store.setMembers(group.id, this.members());
+    this.active.set({ ...group, users: this.members() });
+  }
+
   private syncUrl() {
+    const group = this.active();
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { users: this.members().length ? this.members().join(',') : null },
+      queryParams: group
+        ? { g: group.id, users: null }
+        : { users: this.members().length ? this.members().join(',') : null, g: null },
       queryParamsHandling: 'merge',
     });
   }

@@ -76,6 +76,41 @@
   cursor: pointer;
 }
 .chip-x:hover { color: var(--red-600); }
+
+.save-row { border-top: var(--border-subtle); padding-top: 8px; }
+
+.saved-list { display: flex; flex-direction: column; }
+.saved-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-top: var(--border-subtle);
+}
+.saved-row:first-child { border-top: 0; }
+.saved-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  padding: 2px 0;
+  text-align: left;
+  cursor: pointer;
+}
+.saved-name { font-size: 13px; font-weight: 700; color: var(--color-primary); }
+.saved-open:hover .saved-name { text-decoration: underline; }
+.saved-members {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.saved-when { flex: none; font-size: 11px; color: var(--color-text-muted); }
+.saved-row .chip-x { color: var(--color-text-muted); margin: -10px 0 -10px -4px; }
 .placeholder { padding: 24px 16px; text-align: center; font-size: 13px; color: var(--color-text-muted); }
 
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }

@@ -1,51 +1,119 @@
-<p align="center"><img src="public/icon-192.png" width="96" alt="AniMatch logo"></p>
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/lockup-dark.svg">
+    <img alt="AniMatch" src="docs/brand/lockup.svg" height="40">
+  </picture>
+</h1>
 
-<h1 align="center">AniMatch</h1>
+**Find out if you and a friend actually share taste in anime.** Enter two AniList usernames.
+AniMatch scores how compatible your taste is, shows where you disagree, and picks what to watch
+together.
 
-<p align="center"><strong><a href="https://animatch-moe.vercel.app">animatch-moe.vercel.app</a></strong></p>
+Comparing taste on AniList usually means opening two profiles side by side and scrolling. Which
+shows did you both finish? Does your 7 mean the same as their 9? What's on both of your
+plan-to-watch lists? AniMatch reads both public lists and answers all three on one page. It also
+works for a whole group of friends.
 
-Compare anime taste between [AniList](https://anilist.co) users. One place that answers: **how compatible are we, where do we disagree, and what should we watch together?**
+> **Status:** live at [animatch-moe.vercel.app](https://animatch-moe.vercel.app). Compare,
+> shared backlog, groups and recommendations all run on real AniList data. Next is a session
+> planner for shared backlogs. See [ROADMAP.md](ROADMAP.md).
 
-![Compare — head-to-head](docs/screenshots/compare.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/compare-dark.png">
+  <img alt="The compare page for Anime × Kira: a 39/100 taste match, the compatibility breakdown, their biggest disagreements, the shared anime they both scored, score distributions and genre taste profiles" src="docs/screenshots/compare.png">
+</picture>
 
-## ✨ Features
+## Try it
 
-- ⚖️ **Head-to-head compare** — a 0–100 taste match score broken down into score correlation, genre overlap, completed overlap, and studio affinity.
-- 💥 **Biggest disagreements** — the titles you two scored furthest apart, with per-user scores and delta badges.
-- 📊 **Score distributions & genre profiles** — side-by-side histograms and per-genre bars, with a radar-spread toggle.
-- 🎯 **Recommendations** — top picks neither of you has listed, ranked by predicted mutual enjoyment with a reason per pick.
-- 📚 **Shared backlog** — titles in both plan-to-watch lists, ranked by predicted mutual score, with watch-together picks.
-- 👥 **Groups** — member stats, a pairwise taste-match heat matrix, and the backlog shared by the whole group. Save named groups to reopen them anytime.
-- 📱 **Mobile layout** — compact summary view with bottom navigation under 720px.
-- 🪪 **Profiles & sign-in** — view any public profile's stats (score distribution, genre taste, top studios), or connect your own AniList account via OAuth. Recent comparisons and groups persist locally.
-- 🌙 **Dark mode** — follows your OS by default, with a sun/moon toggle; the full token set is contrast-validated in both themes.
+Open [animatch-moe.vercel.app](https://animatch-moe.vercel.app) and enter two usernames. Any
+public AniList profile works, and you don't need an account. For a sample, see
+[Anime × Kira](https://animatch-moe.vercel.app/compare?a=Anime&b=Kira).
+
+## How it works
+
+```text
+animatch-moe.vercel.app/compare?a=Anime&b=Kira
+
+Anime × Kira · 39/100 · Some common ground
+
+                    value  weight
+score correlation    0.10     45%   Pearson r on the 64 titles both scored
+genre overlap         96%     30%   cosine similarity of their genre mix
+completed overlap     14%     15%   65 of 474 completed titles are shared
+studio affinity       40%     10%   studios both rate highly
+```
+
+The score is the weighted sum: 0.45 × 10 + 0.30 × 96 + 0.15 × 14 + 0.10 × 40 = 39. Agreeing on
+scores counts most. Two people who watch the same genres but rate them differently still score
+low, so this pair lands at 39 despite 96% genre overlap. Every comparison has its own link, so you
+can send it to the other person.
+
+## What it does
+
+- **Scores** any two AniList users from 0 to 100, with the breakdown above.
+- **Finds** your biggest disagreements: the titles you two scored furthest apart.
+- **Compares** score distributions and genre taste side by side, as bars or a radar chart.
+- **Recommends** popular, highly rated titles neither of you has listed, ranked by how much you
+  would both enjoy them, with a reason for each pick.
+- **Merges** your plan-to-watch lists into a shared backlog, ranked by predicted mutual score.
+- **Groups** friends: stats for each member, a taste-match grid for every pair, and the backlog
+  the whole group shares. Save a group under a name to reopen it later.
+- **Shares** a comparison as an image card, ready to paste into a chat or save.
+- **Signs in** with AniList (optional) so your own profile fills in automatically.
+- **Fits** phones and follows your system's dark mode.
 
 | Shared backlog | Groups |
 | --- | --- |
-| ![Shared backlog](docs/screenshots/backlog.png) | ![Groups](docs/screenshots/groups.png) |
+| ![The shared backlog: titles on both plan-to-watch lists, ranked by predicted mutual score](docs/screenshots/backlog.png) | ![The groups page: member stats, a pairwise taste-match grid and the group's shared backlog](docs/screenshots/groups.png) |
 
 | Recommendations | Mobile |
 | --- | --- |
-| ![Recommendations](docs/screenshots/recommendations.png) | ![Mobile](docs/screenshots/compare-mobile.png) |
+| ![Recommendations: titles neither user has listed, with a predicted score and a reason for each](docs/screenshots/recommendations.png) | ![The compare page on a phone](docs/screenshots/compare-mobile.png) |
 
-## 🛠️ Stack
+## Your lists stay yours
 
-- **Angular 22** — standalone components, signals, typed routes.
-- **Hikari design system** — an information-dense, portal-style design language ported as CSS tokens (`src/styles/tokens/`) and reusable components (`src/app/ui/`).
-- **AniList GraphQL** — public API, no auth: full lists (completed, planning, watching), user search, avatars, and cover art. Compare via `/compare?a=<user>&b=<user>`, groups via `/groups?users=<a,b,c>`; the design mockup's data shows as a demo until real users are loaded. See [ROADMAP.md](ROADMAP.md) for what's next.
+- **No AniMatch server.** The site is static files. Your browser loads lists straight from
+  AniList's public API.
+- **Read-only.** AniMatch never changes anything on your AniList account.
+- **Kept in your browser.** Recent comparisons, saved groups and the optional sign-in token are
+  stored in your browser only. The token is sent only to AniList.
+- **No analytics** and no tracking.
+- **Open source**, so you can check all of this.
 
-## 🚀 Getting started
+## Development
 
-```bash
+You need Node 24.
+
+```sh
 npm install
-npm start        # dev server on http://localhost:4200
-npm run build    # production build to dist/
-npm test         # unit tests (vitest)
-npm run e2e      # end-to-end tests (playwright, starts its own dev server)
+npm start                   # dev server on http://localhost:4200
+npm test                    # unit tests (Vitest)
+npm run e2e                 # end-to-end tests (Playwright, starts its own server)
+npm run build               # production build to dist/
+node scripts/screenshots.mjs  # regenerate docs/screenshots (needs npm start -- --port 4213)
 ```
 
-## ☁️ Deploy
+It's an Angular 22 app. It uses standalone components and signals, and gets its data from the
+AniList GraphQL API. The UI is built on the Hikari design system, whose CSS tokens live in
+`src/styles/tokens/` and components in `src/app/ui/`. CI runs the build and both test suites on
+pushes to `main` and on pull requests. Vercel deploys `main`, and `vercel.json` handles the SPA
+rewrites.
 
-Built for [Vercel](https://vercel.com) — import the repo at vercel.com/new and the included `vercel.json` handles the SPA rewrites and output directory. CI (build + unit + e2e) runs on every push via GitHub Actions.
+The logo and lockups are in [docs/brand](docs/brand).
 
-To enable one-click "Connect AniList" (site owner, once): register an API client at [anilist.co/settings/developer](https://anilist.co/settings/developer) with redirect URL `https://<your-domain>/auth/callback` and set the client ID in `src/app/anilist.config.ts`. End users then just click Connect → approve → done.
+### Your own AniList client
+
+Signing in needs a registered AniList API client. The live site has one. For a fork, register
+your own at [anilist.co/settings/developer](https://anilist.co/settings/developer) with the
+redirect URL `https://<your-domain>/auth/callback`. Then set `ANILIST_CLIENT_ID` in
+`src/app/anilist.config.ts`. The client ID is public by design, because the implicit grant flow
+uses no secret.
+
+## Contributing
+
+Issues and pull requests are welcome. The next unchecked item in [ROADMAP.md](ROADMAP.md) is
+what's being built.
+
+## License
+
+[MIT](LICENSE)

@@ -19,11 +19,12 @@ const SAVED_GROUP = {
 
 const browser = await chromium.launch();
 
-async function shot(name, path, { mobile = false, savedGroups = null } = {}) {
+async function shot(name, path, { mobile = false, savedGroups = null, theme = 'light' } = {}) {
   const context = await browser.newContext({
     viewport: mobile ? { width: 390, height: 900 } : { width: 960, height: 750 },
     deviceScaleFactor: 2,
   });
+  await context.addInitScript((t) => localStorage.setItem('animatch.theme', t), theme);
   const page = await context.newPage();
   if (savedGroups) {
     await page.addInitScript((groups) => {
@@ -40,6 +41,7 @@ async function shot(name, path, { mobile = false, savedGroups = null } = {}) {
 }
 
 await shot('compare', `/compare?${PAIR}`);
+await shot('compare-dark', `/compare?${PAIR}`, { theme: 'dark' });
 await shot('backlog', `/backlog?${PAIR}`);
 await shot('groups', '/groups?g=sample', { savedGroups: [SAVED_GROUP] });
 await shot('recommendations', `/recommendations?${PAIR}`);

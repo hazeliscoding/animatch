@@ -1,14 +1,15 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { HkBrandMark } from './brand-mark';
 
 @Component({
   selector: 'hk-global-header',
-  imports: [RouterLink],
+  imports: [RouterLink, HkBrandMark],
   template: `
     <header class="header">
       <div class="inner">
         <a routerLink="/" class="brand hk-link-quiet">
-          <span class="logo-mark" aria-hidden="true">AM</span>
+          <hk-brand-mark [size]="30" />
           <span class="wordmark">{{ brand() }}</span>
           @if (tagline(); as t) {
             <span class="tagline">{{ t }}</span>
@@ -29,28 +30,14 @@ import { RouterLink } from '@angular/router';
       gap: 20px;
     }
     .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; white-space: nowrap; }
-    .logo-mark {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-      border-radius: 7px;
-      background: var(--color-primary);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1;
-      flex: none;
-    }
     .tagline { align-self: flex-end; margin-bottom: 3px; }
     .wordmark {
+      font-family: 'Outfit', sans-serif;
       font-size: 24px;
       font-weight: 700;
-      color: var(--color-primary);
-      letter-spacing: 0.02em;
-      font-feature-settings: 'palt';
+      line-height: 1;
+      color: var(--color-text);
+      letter-spacing: -0.02em;
     }
     .tagline { font-size: var(--text-xs); color: var(--color-text-muted); }
     .middle { flex: 1; min-width: 0; }

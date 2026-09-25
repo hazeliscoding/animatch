@@ -6,6 +6,7 @@ import { AnilistService, AnilistUserHit } from './api/anilist.service';
 import { AuthService } from './api/auth.service';
 import { SeoService } from './seo.service';
 import { ThemeService } from './theme.service';
+import { HkBrandMark } from './ui/brand-mark';
 import { HkGlobalHeader } from './ui/global-header';
 import { HkGlobalNav } from './ui/global-nav';
 import { HkSearchInput } from './ui/search-input';
@@ -14,7 +15,7 @@ import { NAV_ITEMS, UTIL_LEFT } from './data/animatch-data';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, HkGlobalHeader, HkGlobalNav, HkSearchInput, HkUtilityBar],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, HkBrandMark, HkGlobalHeader, HkGlobalNav, HkSearchInput, HkUtilityBar],
   templateUrl: './app.html',
   styleUrl: './app.css',
   host: { '(document:click)': 'onDocumentClick($event)' },

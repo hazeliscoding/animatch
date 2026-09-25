@@ -2,6 +2,7 @@
 // tokens so it matches the user's current theme (light or dark).
 
 import { SITE_URL } from '../anilist.config';
+import { MARK_BACK_STAR, MARK_FRONT_STAR } from '../ui/brand-mark';
 import { ComparisonView } from './comparison-engine';
 
 const W = 1200;
@@ -72,6 +73,7 @@ export async function renderShareCard(view: ComparisonView, scoreHint: string): 
   await document.fonts.ready;
   await Promise.allSettled([
     document.fonts.load('700 120px "Noto Sans JP"'),
+    document.fonts.load('700 34px Outfit', 'AniMatch'),
     document.fonts.load('400 24px "Noto Sans JP"'),
   ]);
 
@@ -108,22 +110,28 @@ export async function renderShareCard(view: ComparisonView, scoreHint: string): 
   roundRect(ctx, 40, 44, W - 80, H - 88, 14);
   ctx.fill();
 
-  // brand: AM mark + wordmark
-  ctx.fillStyle = primary;
-  roundRect(ctx, 80, 84, 56, 56, 13);
-  ctx.fill();
-  ctx.fillStyle = '#ffffff';
-  ctx.font = '700 24px "Noto Sans JP", sans-serif';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('AM', 108, 114);
+  // brand: twin-stars mark + wordmark, proportioned like docs/brand/lockup.svg
+  const markSize = 44;
+  ctx.save();
+  ctx.translate(80, 114 - markSize / 2);
+  ctx.scale(markSize / 64, markSize / 64);
+  ctx.fillStyle = token('--color-brand-star-tint') || '#dbe8fb';
+  ctx.fill(new Path2D(MARK_BACK_STAR));
+  ctx.fillStyle = token('--color-brand-star') || '#0f57c2';
+  ctx.fill(new Path2D(MARK_FRONT_STAR));
+  ctx.restore();
   ctx.textAlign = 'left';
-  ctx.fillStyle = primary;
-  ctx.font = '700 34px "Noto Sans JP", sans-serif';
-  ctx.fillText('AniMatch', 152, 114);
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = text;
+  ctx.font = '700 34px Outfit, "Noto Sans JP", sans-serif';
+  ctx.letterSpacing = '-0.68px';
+  ctx.fillText('AniMatch', 80 + markSize + 13, 114 + 34 * 0.37);
+  const wordmarkEnd = 80 + markSize + 13 + ctx.measureText('AniMatch').width;
+  ctx.letterSpacing = '0px';
+  ctx.textBaseline = 'middle';
   ctx.fillStyle = muted;
   ctx.font = '400 18px "Noto Sans JP", sans-serif';
-  ctx.fillText('for AniList', 318, 118);
+  ctx.fillText('for AniList', wordmarkEnd + 10, 118);
 
   // users: avatar A  nameA × nameB  avatar B
   const avatarSize = 76;

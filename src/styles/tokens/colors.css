@@ -21,6 +21,8 @@
 --color-new:var(--red-600);--color-sale:var(--red-600);--color-ranking:var(--orange-600);--color-ranking-gold:#8a6508;--color-ranking-silver:#6a707d;--color-ranking-bronze:#9a6a43;
 --color-focus:#0f57c2;--color-selection:var(--blue-100);
 --color-header:var(--gray-900);--color-nav-active:var(--blue-700);
+/* brand mark: twin stars (docs/brand) */
+--color-brand-star:#0f57c2;--color-brand-star-tint:#dbe8fb;
 color-scheme:light;
 }
 
@@ -41,6 +43,7 @@ color-scheme:dark;
 --color-link:#79a8f2;--color-link-hover:#9dbff6;--color-link-visited:var(--purple-600);
 --color-primary:#2a63c4;--color-primary-hover:#3672d4;--color-primary-active:#1f56b8;--color-primary-subtle:var(--blue-50);
 --color-focus:#79a8f2;--color-selection:#2a3f66;
+--color-brand-star:#dbe8fb;--color-brand-star-tint:#454b56;
 --shadow-raised:0 1px 2px rgba(0,0,0,.4);
 --shadow-overlay:0 2px 8px rgba(0,0,0,.5);
 --shadow-modal:0 4px 20px rgba(0,0,0,.6);
